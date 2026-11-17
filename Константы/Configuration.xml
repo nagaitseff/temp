@@ -32,8 +32,13 @@
 			</xr:ContainedObject>
 		</InternalInfo>
 		<Properties>
-			<Name>Конфигурация</Name>
-			<Synonym/>
+			<Name>ПрикладныеНастройки</Name>
+			<Synonym>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Прикладные настройки</v8:content>
+				</v8:item>
+			</Synonym>
 			<Comment/>
 			<NamePrefix/>
 			<ConfigurationExtensionCompatibilityMode>Version8_3_27</ConfigurationExtensionCompatibilityMode>
@@ -240,12 +245,12 @@
 			<SynchronousPlatformExtensionAndAddInCallUseMode>DontUse</SynchronousPlatformExtensionAndAddInCallUseMode>
 			<InterfaceCompatibilityMode>Taxi</InterfaceCompatibilityMode>
 			<DatabaseTablespacesUseMode>DontUse</DatabaseTablespacesUseMode>
-			<CompatibilityMode>Version8_3_8</CompatibilityMode>
+			<CompatibilityMode>Version8_3_26</CompatibilityMode>
 			<DefaultConstantsForm/>
 		</Properties>
 		<ChildObjects>
 			<Language>Русский</Language>
-			<Catalog>ДопКонстанты</Catalog>
+			<Catalog>ГруппыПрикладныхНастроек</Catalog>
 		</ChildObjects>
 	</Configuration>
 </MetaDataObject>
