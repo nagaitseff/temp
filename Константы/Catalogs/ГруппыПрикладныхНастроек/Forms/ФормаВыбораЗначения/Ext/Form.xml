@@ -37,31 +37,31 @@
 			<ShowTitle>false</ShowTitle>
 			<ExtendedTooltip name="Группа1РасширеннаяПодсказка" id="15"/>
 			<ChildItems>
-				<Button name="Ок" id="10">
+				<Button name="СохранитьЗначениеНастройки" id="10">
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
 					<DefaultButton>true</DefaultButton>
-					<CommandName>Form.Command.Ок</CommandName>
+					<CommandName>Form.Command.СохранитьЗначениеНастройки</CommandName>
 					<Picture>
 						<xr:Ref>StdPicture.WriteAndClose</xr:Ref>
 						<xr:LoadTransparent>true</xr:LoadTransparent>
 					</Picture>
-					<ExtendedTooltip name="ОкРасширеннаяПодсказка" id="11"/>
+					<ExtendedTooltip name="СохранитьЗначениеНастройкиРасширеннаяПодсказка" id="11"/>
 				</Button>
 				<Button name="ОчиститьЗначение" id="16">
 					<Type>UsualButton</Type>
 					<CommandName>Form.Command.ОчиститьЗначение</CommandName>
 					<ExtendedTooltip name="ОчиститьЗначениеРасширеннаяПодсказка" id="17"/>
 				</Button>
-				<Button name="Отмена" id="12">
+				<Button name="ОтменитьРедактирование" id="12">
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
-					<CommandName>Form.Command.Отмена</CommandName>
+					<CommandName>Form.Command.ОтменитьРедактирование</CommandName>
 					<Picture>
 						<xr:Ref>StdPicture.Stop</xr:Ref>
 						<xr:LoadTransparent>true</xr:LoadTransparent>
 					</Picture>
-					<ExtendedTooltip name="ОтменаРасширеннаяПодсказка" id="13"/>
+					<ExtendedTooltip name="ОтменитьРедактированиеРасширеннаяПодсказка" id="13"/>
 				</Button>
 			</ChildItems>
 		</UsualGroup>
@@ -126,7 +126,7 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
-		<Command name="Ок" id="1">
+		<Command name="СохранитьЗначениеНастройки" id="1">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -139,10 +139,10 @@
 					<v8:content>Сохранить</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>Ок</Action>
+			<Action>СохранитьЗначениеНастройки</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="Отмена" id="2">
+		<Command name="ОтменитьРедактирование" id="2">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -155,7 +155,7 @@
 					<v8:content>Отмена</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>Отмена</Action>
+			<Action>ОтменитьРедактирование</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
 		<Command name="ОчиститьЗначение" id="3">

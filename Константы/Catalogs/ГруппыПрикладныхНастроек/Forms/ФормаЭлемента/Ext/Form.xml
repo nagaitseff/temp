@@ -24,15 +24,15 @@
 					<ContextMenu name="НаименованиеКонтекстноеМеню" id="2"/>
 					<ExtendedTooltip name="НаименованиеРасширеннаяПодсказка" id="3"/>
 				</InputField>
-				<Button name="СменитьНаименование" id="48">
+				<Button name="ПереименоватьГруппу" id="48">
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
-					<CommandName>Form.Command.СменитьНаименование</CommandName>
+					<CommandName>Form.Command.ПереименоватьГруппу</CommandName>
 					<Picture>
 						<xr:Ref>StdPicture.Change</xr:Ref>
 						<xr:LoadTransparent>true</xr:LoadTransparent>
 					</Picture>
-					<ExtendedTooltip name="СменитьНаименованиеРасширеннаяПодсказка" id="49"/>
+					<ExtendedTooltip name="ПереименоватьГруппуРасширеннаяПодсказка" id="49"/>
 				</Button>
 			</ChildItems>
 		</UsualGroup>
@@ -48,15 +48,15 @@
 			<AutoCommandBar name="ЗначенияКонстантКоманднаяПанель" id="6">
 				<Autofill>false</Autofill>
 				<ChildItems>
-					<Button name="ЗначенияКонстантДобавитьКонстанту" id="52">
+					<Button name="ЗначенияКонстантДобавитьНастройку" id="52">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ДобавитьКонстанту</CommandName>
+						<CommandName>Form.Command.ДобавитьНастройку</CommandName>
 						<Picture>
 							<xr:Ref>StdPicture.CreateListItem</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
-						<ExtendedTooltip name="ЗначенияКонстантДобавитьКонстантуРасширеннаяПодсказка" id="53"/>
+						<ExtendedTooltip name="ЗначенияКонстантДобавитьНастройкуРасширеннаяПодсказка" id="53"/>
 					</Button>
 					<Button name="ЗначенияКонстантИзменитьЗначение" id="59">
 						<Type>CommandBarButton</Type>
@@ -68,15 +68,15 @@
 						</Picture>
 						<ExtendedTooltip name="ЗначенияКонстантИзменитьЗначениеРасширеннаяПодсказка" id="61"/>
 					</Button>
-					<Button name="ЗначенияКонстантУдалитьКонстанту" id="54">
+					<Button name="ЗначенияКонстантУдалитьНастройку" id="54">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.УдалитьКонстанту</CommandName>
+						<CommandName>Form.Command.УдалитьНастройку</CommandName>
 						<Picture>
 							<xr:Ref>StdPicture.Delete</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
-						<ExtendedTooltip name="ЗначенияКонстантУдалитьКонстантуРасширеннаяПодсказка" id="55"/>
+						<ExtendedTooltip name="ЗначенияКонстантУдалитьНастройкуРасширеннаяПодсказка" id="55"/>
 					</Button>
 				</ChildItems>
 			</AutoCommandBar>
@@ -186,7 +186,7 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
-		<Command name="СменитьНаименование" id="1">
+		<Command name="ПереименоватьГруппу" id="1">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -199,10 +199,10 @@
 					<v8:content>Переименовать</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>СменитьНаименование</Action>
+			<Action>ПереименоватьГруппу</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="ДобавитьКонстанту" id="2">
+		<Command name="ДобавитьНастройку" id="2">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -215,10 +215,10 @@
 					<v8:content>Добавить настройку</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>ДобавитьКонстанту</Action>
+			<Action>ДобавитьНастройку</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="УдалитьКонстанту" id="3">
+		<Command name="УдалитьНастройку" id="3">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -231,7 +231,7 @@
 					<v8:content>Удалить настройку</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>УдалитьКонстанту</Action>
+			<Action>УдалитьНастройку</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
 		<Command name="ИзменитьЗначение" id="4">

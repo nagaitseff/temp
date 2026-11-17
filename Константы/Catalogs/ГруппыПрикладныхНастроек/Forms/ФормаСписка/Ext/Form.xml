@@ -3,15 +3,15 @@
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
-			<Button name="ФормаСоздатьНовуюГруппуКонстант" id="21">
+			<Button name="ФормаСоздатьГруппу" id="21">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.СоздатьНовуюГруппуКонстант</CommandName>
+				<CommandName>Form.Command.СоздатьГруппу</CommandName>
 				<Picture>
 					<xr:Ref>StdPicture.CreateListItem</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
-				<ExtendedTooltip name="ФормаСоздатьНовуюГруппуКонстантРасширеннаяПодсказка" id="22"/>
+				<ExtendedTooltip name="ФормаСоздатьГруппуРасширеннаяПодсказка" id="22"/>
 			</Button>
 			<Button name="ФормаОбновить" id="23">
 				<Type>CommandBarButton</Type>
@@ -157,7 +157,7 @@
 			<Action>ВыполнитьТесты</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="СоздатьНовуюГруппуКонстант" id="2">
+		<Command name="СоздатьГруппу" id="2">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -170,7 +170,7 @@
 					<v8:content>Создать группу</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>СоздатьНовуюГруппуКонстант</Action>
+			<Action>СоздатьГруппу</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
 	</Commands>
