@@ -139,6 +139,13 @@
 						<Event name="OnChange">ЗначенияКонстантСкрыватьПриИзменении</Event>
 					</Events>
 				</CheckBoxField>
+				<CheckBoxField name="ЗначенияКонстантЭтоСписокЗначений" id="62">
+					<DataPath>Объект.ЗначенияКонстант.ЭтоСписокЗначений</DataPath>
+					<Visible>false</Visible>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="ЗначенияКонстантЭтоСписокЗначенийКонтекстноеМеню" id="63"/>
+					<ExtendedTooltip name="ЗначенияКонстантЭтоСписокЗначенийРасширеннаяПодсказка" id="64"/>
+				</CheckBoxField>
 			</ChildItems>
 		</Table>
 	</ChildItems>
@@ -151,6 +158,11 @@
 			<SavedData>true</SavedData>
 			<Columns>
 				<AdditionalColumns table="Объект.ЗначенияКонстант">
+					<Column name="ЭтоСписокЗначений" id="3">
+						<Type>
+							<v8:Type>xs:boolean</v8:Type>
+						</Type>
+					</Column>
 					<Column name="Значение" id="2">
 						<Title>
 							<v8:item>
@@ -183,6 +195,9 @@
 					</Column>
 				</AdditionalColumns>
 			</Columns>
+			<UseAlways>
+				<Field>Объект.ЗначенияКонстант.ЭтоСписокЗначений</Field>
+			</UseAlways>
 		</Attribute>
 	</Attributes>
 	<Commands>

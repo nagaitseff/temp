@@ -49,7 +49,7 @@
 			<ScriptVariant>Russian</ScriptVariant>
 			<DefaultRoles/>
 			<Vendor/>
-			<Version/>
+			<Version>1.1.1</Version>
 			<UpdateCatalogAddress/>
 			<IncludeHelpInContents>false</IncludeHelpInContents>
 			<UseManagedFormInOrdinaryApplication>false</UseManagedFormInOrdinaryApplication>
@@ -250,6 +250,11 @@
 		</Properties>
 		<ChildObjects>
 			<Language>Русский</Language>
+			<Subsystem>ПрикладныеНастройки</Subsystem>
+			<Role>ЧтениеПрикладныхНастроек</Role>
+			<Role>ДобавлениеИзменениеПрикладныхНастроек</Role>
+			<Role>ЗапускПрикладныхНастроек</Role>
+			<CommonForm>ПросмотрПрикладныхНастроек</CommonForm>
 			<Catalog>ГруппыПрикладныхНастроек</Catalog>
 		</ChildObjects>
 	</Configuration>
