@@ -1,0 +1,396 @@
+Retrieving data
+13:26:10  Initialisation Rabbit-MQ
+13:26:10  Building message
+13:26:10  Sending raw message:
+13:26:10  {"timestamp":"2026-11-18T09:26:10","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"BEGIN"}
+13:26:10  Sending message
+13:26:10  Connection destroyed
+13:26:10  [Pipeline] }
+13:26:10  [Pipeline] // script
+13:26:10  [Pipeline] }
+13:26:10  [Pipeline] // stage
+13:26:10  [Pipeline] stage
+13:26:10  [Pipeline] { (Restore DB)
+13:26:10  [Pipeline] script
+13:26:10  [Pipeline] {
+13:26:10  [Pipeline] echo
+13:26:10  PowerShell Hash Table: @{sourceinfobase = 'UKM-SAPP123:8541|ERP_KGOK_RELEASE_DRAFT'; targetinfobase = 'UKM-SAPP145:6541|ERP_MADIAROV_TEST6'; token = 'o8V6LuVnm8Zm4oVmboAHpooVp8wqbEE8MTx3vMUmt9A='; makecopy = '1'; comment = 'Jenkins: job=any_base_restore_API #2144 | Мадьяров Тимур Тимурович'}
+13:26:10  [Pipeline] echo
+13:26:10  API URL: https://ukm-web/ad/IT/IT_TechAdmin/hs/loading1c/new
+13:26:10  [Pipeline] bat
+13:26:12  [Pipeline] echo
+13:26:12  {
+13:26:12  "code": "00.00",
+13:26:12  "description": "",
+13:26:12  "result": "4c401c09-9fa9-420d-8050-d8dc597b5fab"
+13:26:12  }
+13:26:12  [Pipeline] }
+13:26:12  [Pipeline] // script
+13:26:12  [Pipeline] sleep
+13:26:12  Sleeping for 1 sec
+13:26:13  [Pipeline] rabbitMQPublisher
+13:26:13  Retrieving data
+13:26:13  Initialisation Rabbit-MQ
+13:26:13  Building message
+13:26:13  Sending raw message:
+13:26:13  {"timestamp":"2026-11-18T09:26:10","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"Восстанавливаю базу"}
+13:26:13  Sending message
+13:26:13  Connection destroyed
+13:26:13  [Pipeline] }
+13:26:13  [Pipeline] // stage
+13:26:13  [Pipeline] stage
+13:26:13  [Pipeline] { (Restore DB Status)
+13:26:13  [Pipeline] script
+13:26:13  [Pipeline] {
+13:26:13  [Pipeline] timeout
+13:26:13  Timeout set to expire in 2 hr 0 min
+13:26:13  [Pipeline] {
+13:26:13  [Pipeline] waitUntil
+13:26:13  [Pipeline] {
+13:26:13  [Pipeline] bat
+13:26:14  [Pipeline] echo
+13:26:14  {
+13:26:14  "code": "00.00",
+13:26:14  "description": "",
+13:26:14  "result": 1,
+13:26:14  "update_date": "2026-11-18T09:26:12"
+13:26:14  }
+13:26:14  [Pipeline] sleep
+13:26:14  Sleeping for 1 sec
+13:26:15  [Pipeline] rabbitMQPublisher
+13:26:15  Retrieving data
+13:26:15  Initialisation Rabbit-MQ
+13:26:15  Building message
+13:26:15  Sending raw message:
+13:26:15  {"timestamp":"2026-11-18T09:26:15","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"В процессе..."}
+13:26:15  Sending message
+13:26:15  Connection destroyed
+13:26:15  [Pipeline] echo
+13:26:15  В процессе...
+13:26:15  [Pipeline] sleep
+13:26:15  Sleeping for 1 min 0 sec
+13:27:15  [Pipeline] }
+13:27:15  Will try again after 0,25 sec
+13:27:15  [Pipeline] {
+13:27:15  [Pipeline] bat
+13:27:17  [Pipeline] echo
+13:27:17  {
+13:27:17  "code": "00.00",
+13:27:17  "description": "",
+13:27:17  "result": 1,
+13:27:17  "update_date": "2026-11-18T09:27:13"
+13:27:17  }
+13:27:17  [Pipeline] echo
+13:27:17  В процессе...
+13:27:17  [Pipeline] sleep
+13:27:17  Sleeping for 1 min 0 sec
+13:28:17  [Pipeline] }
+13:28:17  Will try again after 0,3 sec
+13:28:17  [Pipeline] {
+13:28:17  [Pipeline] bat
+13:28:19  [Pipeline] echo
+13:28:19  {
+13:28:19  "code": "00.00",
+13:28:19  "description": "",
+13:28:19  "result": 1,
+13:28:19  "update_date": "2026-11-18T09:27:13"
+13:28:19  }
+13:28:19  [Pipeline] echo
+13:28:19  В процессе...
+13:28:19  [Pipeline] sleep
+13:28:19  Sleeping for 1 min 0 sec
+13:29:19  [Pipeline] }
+13:29:19  Will try again after 0,36 sec
+13:29:19  [Pipeline] {
+13:29:19  [Pipeline] bat
+13:29:21  [Pipeline] echo
+13:29:21  {
+13:29:21  "code": "00.00",
+13:29:21  "description": "",
+13:29:21  "result": 1,
+13:29:21  "update_date": "2026-11-18T09:27:13"
+13:29:21  }
+13:29:21  [Pipeline] echo
+13:29:21  В процессе...
+13:29:21  [Pipeline] sleep
+13:29:21  Sleeping for 1 min 0 sec
+13:30:21  [Pipeline] }
+13:30:21  Will try again after 0,43 sec
+13:30:21  [Pipeline] {
+13:30:21  [Pipeline] bat
+13:30:23  [Pipeline] echo
+13:30:23  {
+13:30:23  "code": "00.00",
+13:30:23  "description": "",
+13:30:23  "result": 1,
+13:30:23  "update_date": "2026-11-18T09:27:13"
+13:30:23  }
+13:30:23  [Pipeline] echo
+13:30:23  В процессе...
+13:30:23  [Pipeline] sleep
+13:30:23  Sleeping for 1 min 0 sec
+13:31:23  [Pipeline] }
+13:31:23  Will try again after 0,51 sec
+13:31:23  [Pipeline] {
+13:31:23  [Pipeline] bat
+13:31:25  [Pipeline] echo
+13:31:25  {
+13:31:25  "code": "00.00",
+13:31:25  "description": "",
+13:31:25  "result": 1,
+13:31:25  "update_date": "2026-11-18T09:27:13"
+13:31:25  }
+13:31:25  [Pipeline] echo
+13:31:25  В процессе...
+13:31:25  [Pipeline] sleep
+13:31:25  Sleeping for 1 min 0 sec
+13:32:25  [Pipeline] }
+13:32:25  Will try again after 0,62 sec
+13:32:26  [Pipeline] {
+13:32:26  [Pipeline] bat
+13:32:27  [Pipeline] echo
+13:32:27  {
+13:32:27  "code": "00.00",
+13:32:27  "description": "",
+13:32:27  "result": 1,
+13:32:27  "update_date": "2026-11-18T09:27:13"
+13:32:27  }
+13:32:27  [Pipeline] echo
+13:32:27  В процессе...
+13:32:27  [Pipeline] sleep
+13:32:27  Sleeping for 1 min 0 sec
+13:33:27  [Pipeline] }
+13:33:27  Will try again after 0,74 sec
+13:33:28  [Pipeline] {
+13:33:28  [Pipeline] bat
+13:33:29  [Pipeline] echo
+13:33:29  {
+13:33:29  "code": "00.00",
+13:33:29  "description": "",
+13:33:29  "result": 1,
+13:33:29  "update_date": "2026-11-18T09:33:13"
+13:33:29  }
+13:33:29  [Pipeline] echo
+13:33:29  В процессе...
+13:33:29  [Pipeline] sleep
+13:33:29  Sleeping for 1 min 0 sec
+13:34:29  [Pipeline] }
+13:34:29  Will try again after 0,89 sec
+13:34:30  [Pipeline] {
+13:34:30  [Pipeline] bat
+13:34:32  [Pipeline] echo
+13:34:32  {
+13:34:32  "code": "00.00",
+13:34:32  "description": "",
+13:34:32  "result": 1,
+13:34:32  "update_date": "2026-11-18T09:33:39"
+13:34:32  }
+13:34:32  [Pipeline] echo
+13:34:32  В процессе...
+13:34:32  [Pipeline] sleep
+13:34:32  Sleeping for 1 min 0 sec
+13:35:32  [Pipeline] }
+13:35:32  Will try again after 1 sec
+13:35:33  [Pipeline] {
+13:35:33  [Pipeline] bat
+13:35:34  [Pipeline] echo
+13:35:34  {
+13:35:34  "code": "00.00",
+13:35:34  "description": "",
+13:35:34  "result": 1,
+13:35:34  "update_date": "2026-11-18T09:33:39"
+13:35:34  }
+13:35:34  [Pipeline] echo
+13:35:34  В процессе...
+13:35:34  [Pipeline] sleep
+13:35:34  Sleeping for 1 min 0 sec
+13:36:34  [Pipeline] }
+13:36:35  Will try again after 1,2 sec
+13:36:36  [Pipeline] {
+13:36:36  [Pipeline] bat
+13:36:37  [Pipeline] echo
+13:36:37  {
+13:36:37  "code": "00.00",
+13:36:37  "description": "",
+13:36:37  "result": 1,
+13:36:37  "update_date": "2026-11-18T09:33:39"
+13:36:37  }
+13:36:37  [Pipeline] echo
+13:36:37  В процессе...
+13:36:37  [Pipeline] sleep
+13:36:37  Sleeping for 1 min 0 sec
+13:37:37  [Pipeline] }
+13:37:37  Will try again after 1,5 sec
+13:37:39  [Pipeline] {
+13:37:39  [Pipeline] bat
+13:37:40  [Pipeline] echo
+13:37:40  {
+13:37:40  "code": "00.00",
+13:37:40  "description": "",
+13:37:40  "result": 1,
+13:37:40  "update_date": "2026-11-18T09:33:39"
+13:37:40  }
+13:37:40  [Pipeline] echo
+13:37:40  В процессе...
+13:37:40  [Pipeline] sleep
+13:37:40  Sleeping for 1 min 0 sec
+13:38:40  [Pipeline] }
+13:38:40  Will try again after 1,8 sec
+13:38:42  [Pipeline] {
+13:38:42  [Pipeline] bat
+13:38:44  [Pipeline] echo
+13:38:44  {
+13:38:44  "code": "00.00",
+13:38:44  "description": "",
+13:38:44  "result": 1,
+13:38:44  "update_date": "2026-11-18T09:33:39"
+13:38:44  }
+13:38:44  [Pipeline] echo
+13:38:44  В процессе...
+13:38:44  [Pipeline] sleep
+13:38:44  Sleeping for 1 min 0 sec
+13:39:44  [Pipeline] }
+13:39:44  Will try again after 2,2 sec
+13:39:46  [Pipeline] {
+13:39:46  [Pipeline] bat
+13:39:48  [Pipeline] echo
+13:39:48  {
+13:39:48  "code": "00.00",
+13:39:48  "description": "",
+13:39:48  "result": 1,
+13:39:48  "update_date": "2026-11-18T09:39:13"
+13:39:48  }
+13:39:48  [Pipeline] echo
+13:39:48  В процессе...
+13:39:48  [Pipeline] sleep
+13:39:48  Sleeping for 1 min 0 sec
+13:40:48  [Pipeline] }
+13:40:48  Will try again after 2,6 sec
+13:40:50  [Pipeline] {
+13:40:50  [Pipeline] bat
+13:40:52  [Pipeline] echo
+13:40:52  {
+13:40:52  "code": "00.00",
+13:40:52  "description": "",
+13:40:52  "result": 1,
+13:40:52  "update_date": "2026-11-18T09:39:13"
+13:40:52  }
+13:40:52  [Pipeline] echo
+13:40:52  В процессе...
+13:40:52  [Pipeline] sleep
+13:40:52  Sleeping for 1 min 0 sec
+13:41:52  [Pipeline] }
+13:41:52  Will try again after 3,1 sec
+13:41:55  [Pipeline] {
+13:41:55  [Pipeline] bat
+13:41:57  [Pipeline] echo
+13:41:57  {
+13:41:57  "code": "00.00",
+13:41:57  "description": "",
+13:41:57  "result": 1,
+13:41:57  "update_date": "2026-11-18T09:41:14"
+13:41:57  }
+13:41:57  [Pipeline] echo
+13:41:57  В процессе...
+13:41:57  [Pipeline] sleep
+13:41:57  Sleeping for 1 min 0 sec
+13:42:57  [Pipeline] }
+13:42:57  Will try again after 3,8 sec
+13:43:01  [Pipeline] {
+13:43:01  [Pipeline] bat
+13:43:02  [Pipeline] echo
+13:43:02  {
+13:43:02  "code": "00.00",
+13:43:02  "description": "",
+13:43:02  "result": 1,
+13:43:02  "update_date": "2026-11-18T09:41:14"
+13:43:02  }
+13:43:02  [Pipeline] echo
+13:43:02  В процессе...
+13:43:02  [Pipeline] sleep
+13:43:02  Sleeping for 1 min 0 sec
+13:44:02  [Pipeline] }
+13:44:02  Will try again after 4,6 sec
+13:44:07  [Pipeline] {
+13:44:07  [Pipeline] bat
+13:44:08  [Pipeline] echo
+13:44:08  {
+13:44:08  "code": "00.00",
+13:44:08  "description": "",
+13:44:08  "result": 0,
+13:44:08  "update_date": "2026-11-18T09:43:04"
+13:44:08  }
+13:44:08  [Pipeline] sleep
+13:44:08  Sleeping for 1 sec
+13:44:09  [Pipeline] rabbitMQPublisher
+13:44:09  Retrieving data
+13:44:09  Initialisation Rabbit-MQ
+13:44:09  Building message
+13:44:09  Sending raw message:
+13:44:09  {"timestamp":"2026-11-18T09:44:09","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"Восстановление завершено"}
+13:44:09  Sending message
+13:44:09  Connection destroyed
+13:44:09  [Pipeline] echo
+13:44:09  Восстановление завершено
+13:44:09  [Pipeline] }
+13:44:09  [Pipeline] // waitUntil
+13:44:09  [Pipeline] }
+13:44:09  [Pipeline] // timeout
+13:44:09  [Pipeline] }
+13:44:09  [Pipeline] // script
+13:44:09  [Pipeline] }
+13:44:10  [Pipeline] // stage
+13:44:10  [Pipeline] stage
+13:44:10  [Pipeline] { (Сброс пароля пользователя)
+13:44:10  [Pipeline] script
+13:44:10  [Pipeline] {
+13:44:10  [Pipeline] sleep
+13:44:10  Sleeping for 1 sec
+13:44:11  [Pipeline] script
+13:44:11  [Pipeline] {
+13:44:11  [Pipeline] }
+13:44:11  [Pipeline] // script
+13:44:11  [Pipeline] rabbitMQPublisher
+13:44:11  Retrieving data
+13:44:11  Initialisation Rabbit-MQ
+13:44:11  Building message
+13:44:11  Sending raw message:
+13:44:11  {"timestamp":"2026-11-18T09:44:11","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"Сброс пароля не требуется"}
+13:44:11  Sending message
+13:44:11  Connection destroyed
+13:44:11  [Pipeline] }
+13:44:11  [Pipeline] // script
+13:44:11  [Pipeline] }
+13:44:11  [Pipeline] // stage
+13:44:11  [Pipeline] stage
+13:44:11  [Pipeline] { (Declarative: Post Actions)
+13:44:11  [Pipeline] script
+13:44:11  [Pipeline] {
+13:44:11  [Pipeline] fileExists
+13:44:11  [Pipeline] fileExists
+13:44:11  [Pipeline] fileExists
+13:44:11  [Pipeline] }
+13:44:11  [Pipeline] // script
+13:44:11  [Pipeline] fileOperations
+13:44:11  File Delete Operation:
+13:44:11  [Pipeline] script
+13:44:11  [Pipeline] {
+13:44:11  [Pipeline] sleep
+13:44:11  Sleeping for 1 sec
+13:44:12  0 files found for include pattern '*.txt' and exclude pattern ''
+13:44:12  [Pipeline] }
+13:44:12  [Pipeline] // script
+13:44:12  [Pipeline] rabbitMQPublisher
+13:44:12  Retrieving data
+13:44:12  Initialisation Rabbit-MQ
+13:44:12  Building message
+13:44:12  Sending raw message:
+13:44:12  {"timestamp":"2026-11-18T09:44:12","base_GUID":"7eb206b6-dc59-4c21-abf0-8df15cd5b33b","project":"any_base_restore","status":"SUCCESS"}
+13:44:12  Sending message
+13:44:12  Connection destroyed
+13:44:12  [Pipeline] }
+13:44:12  [Pipeline] // stage
+13:44:12  [Pipeline] }
+13:44:12  [Pipeline] // node
+13:44:12  [Pipeline] End of Pipeline
+13:44:13  Finished: SUCCESS

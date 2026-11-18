@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+  <name>Mechel</name>
+  <version>1.0.0</version>
+  <description>Библиотека частых методов и API-транспорт для пайплайнов 1С</description>
+  <author>user</author>
+  <oscript_version_min>2.1.0</oscript_version_min>
+  <dependencies></dependencies>
+</package>
