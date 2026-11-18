@@ -1,11 +1,32 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcssch="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
-	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
 	<UseForFoldersAndItems>Items</UseForFoldersAndItems>
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
+		<ChildItems>
+			<Button name="ЗаписатьНабор" id="65">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.Command.ЗаписатьНабор</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.Write</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+			</Button>
+			<Button name="ЗаписатьИЗакрытьНабор" id="66">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<DefaultButton>true</DefaultButton>
+				<CommandName>Form.Command.ЗаписатьИЗакрытьНабор</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.WriteAndClose</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+			</Button>
+		</ChildItems>
 	</AutoCommandBar>
 	<Events>
+		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
 		<Event name="AfterWriteAtServer">ПослеЗаписиНаСервере</Event>
 		<Event name="OnReadAtServer">ПриЧтенииНаСервере</Event>
 		<Event name="BeforeWriteAtServer">ПередЗаписьюНаСервере</Event>
@@ -18,6 +39,12 @@
 			<ExtendedTooltip name="Группа1РасширеннаяПодсказка" id="51"/>
 			<ChildItems>
 				<InputField name="Наименование" id="1">
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Имя набора</v8:content>
+						</v8:item>
+					</Title>
 					<DataPath>Объект.Description</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<EditMode>EnterOnInput</EditMode>
@@ -36,6 +63,15 @@
 				</Button>
 			</ChildItems>
 		</UsualGroup>
+		<InputField name="Каталог" id="78">
+			<DataPath>Объект.Parent</DataPath>
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Каталог</v8:content>
+				</v8:item>
+			</Title>
+		</InputField>
 		<Table name="ЗначенияКонстант" id="4">
 			<Representation>List</Representation>
 			<ChangeRowSet>false</ChangeRowSet>
@@ -78,6 +114,34 @@
 						</Picture>
 						<ExtendedTooltip name="ЗначенияКонстантУдалитьНастройкуРасширеннаяПодсказка" id="55"/>
 					</Button>
+					<Button name="НастроитьОтбор" id="80">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.НастроитьОтбор</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.DataCompositionFilter</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+					</Button>
+					<Button name="ПодтвердитьПроверкуВызовов" id="67">
+						<Type>CommandBarButton</Type>
+						<Visible>false</Visible>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ПодтвердитьПроверкуВызовов</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+					</Button>
+					<Button name="ПерейтиПоСсылке" id="77">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ПерейтиПоСсылке</CommandName>
+						<Picture>
+							<xr:Ref xmlns:xr="http://v8.1c.ru/8.3/xcf/readable">StdPicture.GotoExternalURL</xr:Ref>
+							<xr:LoadTransparent xmlns:xr="http://v8.1c.ru/8.3/xcf/readable">true</xr:LoadTransparent>
+						</Picture>
+					</Button>
 				</ChildItems>
 			</AutoCommandBar>
 			<ExtendedTooltip name="ЗначенияКонстантРасширеннаяПодсказка" id="7"/>
@@ -107,14 +171,28 @@
 			</SearchControlAddition>
 			<Events>
 				<Event name="Selection">ЗначенияКонстантВыбор</Event>
+				<Event name="OnActivateRow">ЗначенияКонстантПриАктивизацииСтроки</Event>
 			</Events>
 			<ChildItems>
+				<InputField name="ЗначенияКонстантИмяКонстанты" id="79">
+					<DataPath>Объект.ЗначенияКонстант.ИмяКонстанты</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Имя настройки</v8:content>
+						</v8:item>
+					</Title>
+					<Events>
+						<Event name="OnChange">ЗначенияКонстантИмяПриИзменении</Event>
+					</Events>
+				</InputField>
 				<InputField name="ЗначенияКонстантПолноеИмяКонстанты" id="42">
 					<DataPath>Объект.ЗначенияКонстант.ПолноеИмяКонстанты</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<EditMode>EnterOnInput</EditMode>
 					<ContextMenu name="ЗначенияКонстантПолноеИмяКонстантыКонтекстноеМеню" id="43"/>
 					<ExtendedTooltip name="ЗначенияКонстантПолноеИмяКонстантыРасширеннаяПодсказка" id="44"/>
+					<Visible>false</Visible>
 				</InputField>
 				<InputField name="ЗначенияКонстантЗначение" id="39">
 					<DataPath>Объект.ЗначенияКонстант.Значение</DataPath>
@@ -145,6 +223,76 @@
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ЗначенияКонстантЭтоСписокЗначенийКонтекстноеМеню" id="63"/>
 					<ExtendedTooltip name="ЗначенияКонстантЭтоСписокЗначенийРасширеннаяПодсказка" id="64"/>
+				</CheckBoxField>
+				<InputField name="ИдентификаторНастройки" id="81">
+					<DataPath>Объект.ЗначенияКонстант.ИдентификаторНастройки</DataPath>
+					<Visible>false</Visible>
+					<ReadOnly>true</ReadOnly>
+				</InputField>
+				<CheckBoxField name="ТребуетсяПроверкаВызовов" id="70">
+					<DataPath>Объект.ЗначенияКонстант.ТребуетсяПроверкаВызовов</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Проверить вызовы</v8:content>
+						</v8:item>
+					</Title>
+				</CheckBoxField>
+				<CheckBoxField name="ПометкаУдаления" id="71">
+					<DataPath>Объект.ЗначенияКонстант.ПометкаУдаления</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Пометка удаления</v8:content>
+						</v8:item>
+					</Title>
+				</CheckBoxField>
+				<InputField name="Описание" id="73">
+					<DataPath>Объект.ЗначенияКонстант.Описание</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Описание</v8:content>
+						</v8:item>
+					</Title>
+					<Visible>false</Visible>
+				</InputField>
+				<InputField name="Автор" id="74">
+					<DataPath>Объект.ЗначенияКонстант.Автор</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Автор</v8:content>
+						</v8:item>
+					</Title>
+					<Visible>false</Visible>
+				</InputField>
+				<InputField name="НавигационнаяСсылка" id="75">
+					<DataPath>Объект.ЗначенияКонстант.НавигационнаяСсылка</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Навигационная ссылка</v8:content>
+						</v8:item>
+					</Title>
+					<Visible>false</Visible>
+				</InputField>
+				<InputField name="ПредыдущийКлюч" id="76">
+					<DataPath>Объект.ЗначенияКонстант.ПредыдущийКлюч</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Ключ до переименования</v8:content>
+						</v8:item>
+					</Title>
+					<Visible>false</Visible>
+				</InputField>
+				<CheckBoxField name="ЭтоОтбор" id="82">
+					<DataPath>Объект.ЗначенияКонстант.ЭтоОтбор</DataPath>
+					<Visible>false</Visible>
+					<ReadOnly>true</ReadOnly>
 				</CheckBoxField>
 			</ChildItems>
 		</Table>
@@ -193,10 +341,24 @@
 							</v8:StringQualifiers>
 						</Type>
 					</Column>
+					<Column name="ЭтоОтбор" id="4">
+						<Type>
+							<v8:Type>xs:boolean</v8:Type>
+						</Type>
+					</Column>
 				</AdditionalColumns>
 			</Columns>
 			<UseAlways>
 				<Field>Объект.ЗначенияКонстант.ЭтоСписокЗначений</Field>
+				<Field>Объект.ЗначенияКонстант.ИдентификаторНастройки</Field>
+			</UseAlways>
+		</Attribute>
+		<Attribute name="АдресИзменений" id="2">
+			<Type>
+				<v8:Type>xs:string</v8:Type>
+			</Type>
+			<UseAlways>
+				<Field>АдресИзменений</Field>
 			</UseAlways>
 		</Attribute>
 	</Attributes>
@@ -205,13 +367,13 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Переименовать</v8:content>
+					<v8:content>Переименовать набор</v8:content>
 				</v8:item>
 			</Title>
 			<ToolTip>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Переименовать</v8:content>
+					<v8:content>Переименовать набор</v8:content>
 				</v8:item>
 			</ToolTip>
 			<Action>ПереименоватьГруппу</Action>
@@ -237,13 +399,13 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Удалить настройку</v8:content>
+					<v8:content>Пометить / снять пометку удаления</v8:content>
 				</v8:item>
 			</Title>
 			<ToolTip>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Удалить настройку</v8:content>
+					<v8:content>Пометить / снять пометку удаления</v8:content>
 				</v8:item>
 			</ToolTip>
 			<Action>УдалитьНастройку</Action>
@@ -253,11 +415,56 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Изменить значение</v8:content>
+					<v8:content>Изменить настройку</v8:content>
 				</v8:item>
 			</Title>
 			<Action>ИзменитьЗначение</Action>
 			<CurrentRowUse>Use</CurrentRowUse>
+		</Command>
+		<Command name="ЗаписатьНабор" id="5">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Записать</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ЗаписатьНабор</Action>
+		</Command>
+		<Command name="ЗаписатьИЗакрытьНабор" id="6">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Записать и закрыть</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ЗаписатьИЗакрытьНабор</Action>
+		</Command>
+		<Command name="ПодтвердитьПроверкуВызовов" id="7">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Подтвердить обновление обращений</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ПодтвердитьПроверкуВызовов</Action>
+		</Command>
+		<Command name="ПерейтиПоСсылке" id="8">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Перейти по ссылке</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ПерейтиПоСсылке</Action>
+		</Command>
+		<Command name="НастроитьОтбор" id="9">
+			<Action>НастроитьОтбор</Action>
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Настроить отбор</v8:content>
+				</v8:item>
+			</Title>
 		</Command>
 	</Commands>
 </Form>

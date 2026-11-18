@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.20">
+	<Events>
+		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
+	</Events>
+	<AutoCommandBar name="КоманднаяПанель" id="-1">
+		<Autofill>false</Autofill>
+		<ChildItems>
+			<Button name="Обновить" id="1">
+				<Type>CommandBarButton</Type>
+				<CommandName>Form.Command.Обновить</CommandName>
+			</Button>
+		</ChildItems>
+	</AutoCommandBar>
+	<ChildItems>
+		<Table name="Настройки" id="2">
+			<DataPath>Настройки</DataPath>
+			<ReadOnly>true</ReadOnly>
+			<ChangeRowSet>false</ChangeRowSet>
+			<ChildItems>
+				<InputField name="ИдентификаторПоставки" id="10">
+					<DataPath>Настройки.ИдентификаторПоставки</DataPath>
+					<ReadOnly>true</ReadOnly>
+				</InputField>
+				<InputField name="ОжидаемыйКлюч" id="11">
+					<DataPath>Настройки.ОжидаемыйКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
+				</InputField>
+				<InputField name="ТекущийКлюч" id="12">
+					<DataPath>Настройки.ТекущийКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
+				</InputField>
+				<InputField name="Состояние" id="13">
+					<DataPath>Настройки.Состояние</DataPath>
+					<ReadOnly>true</ReadOnly>
+				</InputField>
+			</ChildItems>
+		</Table>
+	</ChildItems>
+	<Attributes>
+		<Attribute name="Настройки" id="1">
+			<Type>
+				<v8:Type>v8:ValueTable</v8:Type>
+			</Type>
+			<Columns>
+				<Column name="ИдентификаторПоставки" id="1">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+				<Column name="ОжидаемыйКлюч" id="2">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+				<Column name="ТекущийКлюч" id="3">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+				<Column name="Состояние" id="4">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+			</Columns>
+		</Attribute>
+	</Attributes>
+	<Commands>
+		<Command name="Обновить" id="1">
+			<Action>Обновить</Action>
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Обновить</v8:content>
+				</v8:item>
+			</Title>
+		</Command>
+	</Commands>
+</Form>
