@@ -1,0 +1,59 @@
+pipeline {
+    agent { label "erp_325" }
+
+    stages {
+        stage('Copy Artifacts') {
+            steps {
+                copyArtifacts(
+                    projectName: '04_erp_create_release_cfu',
+                    filter: 'triggers.txt, branch_name.txt, create_ext.txt, create_cf.txt',
+                    selector: lastCompleted()
+                )
+            }
+        }
+
+        stage('Trigger') {
+            steps {
+                script {
+                    // Читаем данные из файлов
+                    def data = readFile('triggers.txt').trim()
+                    def branchName = readFile('branch_name.txt').trim()
+                    
+                    echo "File 'triggers.txt' content: ${data}"
+                    echo "Branch name from file: ${branchName}"
+                    
+                    // Формируем список баз
+                    def values = data.split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+                    
+                    echo "Found ${values.size()} bases to trigger: ${values.join(', ')}"
+
+                    if (values.size() == 0) {
+                        echo "WARNING: No bases found to process. Check 'triggers.txt'."
+                        return // Прерываем выполнение скрипта в этом блоке, если список пуст
+                    }
+
+                    // Последовательный триггер джоб
+                    values.eachWithIndex { val, index ->
+                        // Начиная со второй базы (index > 0) делаем паузу
+                        if (index > 0) {
+                            echo "Ожидание 1 минуту перед запуском базы [${val}]..."
+                            sleep time: 1, unit: 'MINUTES'
+                        }
+
+                        echo "[${val}] STARTING build: BASE_NAME=${val}, BRANCH_NAME=${branchName}"
+                        
+                        // wait: false позволяет запустить джобу и пойти дальше
+                        build job: '06_erp_build_releases', 
+                            wait: false, 
+                            parameters: [
+                                string(name: 'BASE_NAME', value: val),
+                                string(name: 'BRANCH_NAME', value: branchName)
+                            ]
+                    }
+                    
+                    echo "Все целевые базы были успешно запущены в фоне."
+                }
+            }
+        }
+    }
+}

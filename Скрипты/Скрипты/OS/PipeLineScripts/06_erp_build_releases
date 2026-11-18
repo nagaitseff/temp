@@ -1,0 +1,385 @@
+def processedReleaseName = ''
+def processedReleaseNumber = ''
+def processedExt = '0'
+def processedCf = '0'
+def port
+
+def getMailRecipients(String groupName) {
+    def mailCfg = readJSON file: 'mailing-list.json', returnPojo: true
+
+    if (!mailCfg.containsKey(groupName)) {
+        error "Группа '${groupName}' не найдена в mailing-list.json"
+    }
+
+    return mailCfg[groupName].join(',')
+}
+
+def sendEmailNotification(String buildResult) {
+
+        def subject = "Pipeline: ${buildResult}"
+        def body = """<p>Pipeline: ${buildResult}.</p>
+                      <p>Подробности можно найти в Jenkins.</p>
+                      <p>Адрес: ${BUILD_URL}/</p>"""
+        
+        def recipients = getMailRecipients('release')
+        
+        emailext(
+            subject: subject,
+            body: body,
+            mimeType: 'text/html',
+            from: 'Jenkins',
+            to: recipients,
+            attachLog: true
+        )
+}
+
+def isBranchNameValid(String branchName) {
+    def releasePattern = ~/^release\/\d+\.\d+\.\d+\.\d+$/
+    def hotfixPattern = ~/^hotfix\/\d+\.\d+\.\d+\.\d+_\d{2}$/
+    return branchName ==~ releasePattern || branchName ==~ hotfixPattern
+}
+
+pipeline {
+
+    parameters {
+        choice(name: 'BASE_NAME', choices: ['ERP_UNION_YKUZ_STAGING', 'ERP_UNION_YU_STAGING', 'ERP_UNION_KGOK_STAGING'], description: 'База данных для обработки')
+        string(name: 'BRANCH_NAME', defaultValue: 'release/', description: 'Введите номер релиза')
+        string(name: 'LABEL', defaultValue: 'erp_325', description: 'Имя ноды для сборки')
+        booleanParam(name: 'NEED_FIRST_MAINTENCE', defaultValue: false, description: 'Первоначальные настройки базы')
+        booleanParam(name: 'SMOKE_TESTS', defaultValue: true, description: 'Дымовое тестирование: открытие форм')
+        booleanParam(name: 'ENABLE_LOG', defaultValue: false, description: 'Включить отладку')
+    }
+
+    agent {label params.LABEL}
+
+    environment {
+        // Переменные окружения
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+		
+		// Скрипты
+        SCRIPT_COPY_CONSTANTS = '.\\tools\\OS\\CopyConstants.os'
+        SCRIPT_LOCK = '.\\tools\\OS\\LockUnlockBase.os'
+        SCRIPT_LOAD_CFU = '.\\tools\\OS\\LoadCfu.os'
+        SCRIPT_LOAD_EXT = '.\\tools\\OS\\LoadExtension.os'
+		SCRIPT_START_AND_UPDATE = '.\\tools\\OS\\StartAndUpdate.os'
+        SCRIPT_FIRST_START = '.\\tools\\OS\\FirstMaintence.os'
+		SCRIPT_CLEAN = '.\\tools\\OS\\CleanTemp.os'
+        SCRIPT_START_SMOKE_TESTS = '.\\tools\\OS\\SmokeTests.os'
+		
+		// Общие переменные окружения
+		SERVER_NAME = 'UKM-SAPP123'
+		CLUSTER_NAME = '123_clust_admin'
+        COMMAND_LOCK = 'lock'
+        COMMAND_UNLOCK = 'unlock'
+        LOCK_FILE = "base_${params.BASE_NAME}.lock"
+        EXT_NAME = 'Mechel'
+        NAME_FM_FILE = 'fm_release'
+        UNBLOCK_REG = 'true'
+
+        GIT_CREDENTIALS_ID = 'JenkinsReader'
+    }
+
+    stages{
+        stage('Prepare') {
+            steps {
+                script {
+                    try {
+                        echo "Подготовка файла адресатов почты"
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\mailing-list.json" "%WORKSPACE%\\" /Y
+                        '''
+                    } catch (Exception e) {
+                            def errorMessage = "Ошибка копирования файла констант: ${e.getMessage()}, база: ${params.BASE_NAME}"
+                            error(errorMessage)
+                    }
+                    try {
+                        echo "Подготовка файла констант"
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\ConstantsForJobs.json" "%WORKSPACE%\\" /Y
+                        '''
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка копирования файла констант: ${e.getMessage()}, база: ${env.BASE_NAME}"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Check and Checkout SCM') {
+            steps {
+                script {
+                    def branchName = "${env.BRANCH_NAME}"
+
+                    if (!branchName) {
+                        error("Имя ветки не указано.")
+                    }
+                    if (params.BASE_NAME == 'ERP_UNION_YKUZ_STAGING') {
+                        ID_THEME = "1367"
+                    } else if (params.BASE_NAME == 'ERP_UNION_KGOK_STAGING') {
+                        ID_THEME = "1370"
+                    } else {
+                        ID_THEME = "1373"
+                    }
+                    println("Устанавливаемая ветка: ${branchName}")
+
+                    if (!isBranchNameValid(branchName)) {
+                        def errorMessage = "Некорректное имя ветки: ${branchName}. Ожидается формат release/X.X.X.X или hotfix/X.X.X.X"
+                        println(errorMessage)
+                        error(errorMessage)
+                    }
+                    try {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: branchName]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [[$class: 'CloneOption', timeout: 5400], [$class: 'CheckoutOption', timeout: 5400]],
+                            userRemoteConfigs: [[url: 'http://UKM-SAPP115/mechel/erp.git', credentialsId: env.GIT_CREDENTIALS_ID]]
+                        ])
+                       echo "Checkout репозитория, базы: ${params.BASE_NAME} на ветку ${branchName} успешно выполнен."
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка переключения на ветку ${branchName}, база: ${params.BASE_NAME}"
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Copy Artifacts') {
+			steps {
+                script{
+                    try {
+                        copyArtifacts(
+                            projectName: '04_erp_create_release_cfu',
+                            filter: 'triggers.txt, branch_name.txt, create_ext.txt, create_cf.txt',
+                            selector: lastCompleted()
+                        )
+                        echo "Артефакты успешно скопированы."
+                    } catch (Exception e) {
+                        def errorMessage = "Артефакты не найдены: ${e.getMessage()}, База: ${params.BASE_NAME}"
+                        echo errorMessage
+                        sendEmailNotification(errorMessage)
+                        error(e.getMessage())
+                    }
+                }
+			}
+		}
+        stage('Triggers') {
+            steps {
+                script {
+                    def originalBranchName = readFile 'branch_name.txt'
+                    def parts = originalBranchName.split('/')
+                    if (parts.size() >= 2) {
+                        processedReleaseName = parts[0]
+                        processedReleaseNumber = parts[1]
+                        
+                        echo "Извлеченное значение имени: ${processedReleaseName}"
+                        echo "Извлеченное значение номера: ${processedReleaseNumber}"
+                    } else {
+                        def errorMessage = "<b><s>Ошибка: ожидалось две строки, разделенные '/' в имени ветки</s></b>"
+                        sendEmailNotification(errorMessage)
+                        error errorMessage
+                    }
+
+                    def fileContent = readFile('create_ext.txt').trim()
+                    fileContent = fileContent.replaceAll("[^\\x20-\\x7E]", "")
+                    processedExt = fileContent
+
+                    fileContent = readFile('create_cf.txt').trim()
+                    fileContent = fileContent.replaceAll("[^\\x20-\\x7E]", "")
+                    processedCf = fileContent
+                }
+            }
+        }
+        stage('Setup Environment Variables') {
+            steps {
+                script {
+                    port = params.BASE_NAME == 'ERP_UNION_YKUZ_STAGING' ? '3541' : params.BASE_NAME == 'ERP_UNION_YU_STAGING' ? '4541' : '7541'
+                }
+            }
+        }
+        stage('Lock Union & Kick users') {
+			steps {  
+				script {
+                    if (processedCf == '1' || processedExt == '1') {
+                        try {
+					        echo "Блокировка базы, удаление пользователей"
+					        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${params.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_LOCK}"
+                            writeFile file: "${env.LOCK_FILE}", text: 'locked'
+                            echo "Файл блокировки ${env.LOCK_FILE} создан"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка: ${e.getMessage()}"
+                            echo errorMessage
+                            sendEmailNotification(errorMessage)
+                        }
+                    }
+				}
+            }
+        }
+		
+		stage('Load CFU & Apply') {
+            steps {
+                script {
+                    if (processedCf == '1') {
+                        try {
+                            echo "Загрузка файла поставки из ранее созданного"
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_CFU} ${env.SERVER_NAME} ${params.BASE_NAME} ${port} ${processedReleaseNumber} ${processedReleaseName} ${params.ENABLE_LOG}"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка: ${e.getMessage()}"
+                            echo errorMessage
+                            error(errorMessage)
+                            sendEmailNotification(errorMessage)
+                        }
+                    } else {
+                        echo "Нет изменений в конфигурации, загрузка файла поставки в базе ${params.BASE_NAME} пропущена"
+                    }
+                }
+            }
+        }
+		
+		stage('Load EXT & Apply') {
+            steps {
+                script {
+                    if (processedExt == '1') {
+                        try {
+					        echo "Загрузка расширения из ранее созданного файла"
+					        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_EXT} ${env.SERVER_NAME} ${params.BASE_NAME} ${port} ${processedReleaseNumber} ${processedReleaseName} ${env.EXT_NAME} ${params.ENABLE_LOG}"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка: ${e.getMessage()}"
+                            echo errorMessage
+                            error(errorMessage)
+                            sendEmailNotification(errorMessage)
+                        }
+                    } else {
+                        echo "Нет изменений в расширении, загрузка файла в базе ${params.BASE_NAME} пропущено"
+                    }
+                }
+            }
+        }
+		
+		stage('Start & Update') {
+            steps {
+                script {
+                    if (processedCf == '1' || processedExt == '1') {
+                        try {
+					        echo "Запуск с обновлением информационной базы"
+					        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_START_AND_UPDATE} ${env.SERVER_NAME} ${params.BASE_NAME} ${port}"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка: ${e.getMessage()}"
+                            echo errorMessage
+                            sendEmailNotification(errorMessage)
+                        }
+                    }
+                }
+            }
+        }
+		
+		stage('First maintence after restoring') {
+            when { 
+                expression { params.NEED_FIRST_MAINTENCE == true } 
+            }
+            steps {  
+                script {
+                    try {
+                        echo "Установка параметров для восстановленной базы"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_FIRST_START} ${env.SERVER_NAME} ${port} ${params.BASE_NAME} ${env.NAME_FM_FILE} ${params.ENABLE_LOG}"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка: ${e.getMessage()}"
+                        echo errorMessage
+                        sendEmailNotification(errorMessage)
+                    }
+                }
+            }
+        }
+		
+		stage('Unlock') {
+            when {
+                expression { fileExists(env.LOCK_FILE) }
+            }
+            steps {
+                script {
+					echo "Разблокировка базы"
+					bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${params.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_UNLOCK} ${env.UNBLOCK_REG}"
+                    bat "del \"${env.LOCK_FILE}\""
+                }
+            }
+        }
+
+        stage('Smoke Tests') {
+			when { 
+				expression { params.SMOKE_TESTS == true } 
+			}
+			steps {
+				script {
+					if (processedExt.toBoolean() || processedCf.toBoolean()) {
+						try {
+							echo "Тестирование: Запуск дымовых тестов"
+							bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_START_SMOKE_TESTS} ${env.SERVER_NAME} ${params.BASE_NAME} ${port}"
+						} catch (Exception e) {
+							def errorMessage = "Ошибка блока дымового тестирования ${params.BASE_NAME}: " + e.getMessage()
+							sendEmailNotification(errorMessage)
+							echo errorMessage
+						}
+					}
+				}
+			}
+		}
+    }
+
+	post {
+        always {
+			script {
+					allure jdk: '',
+					       report: 'allure/report',
+					       results: [
+					           [path: 'allure/smoke'],
+					           [path: 'allure/syntax-check']
+					       ]
+					
+					sleep 30
+					archiveArtifacts artifacts: 'allure/report/*', excludes: 'allure/report/index.html'
+			}
+		}
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+		unstable {
+			script {
+                def recipients = getMailRecipients('release')
+
+				echo 'Pipeline completed successfully, but smoke tests are unstable!'
+				echo '${buildNumber}'
+				emailext(
+						subject: 'Pipeline "Дымовое тестирование" нестабильно, при выполнении тестов найдены ошибки',
+						body: '''
+							<p>Pipeline "Дымовое тестирование" успешно завершено, но найдены ошибки при тестировании!</p>
+							<p>Подробности можно найти в Jenkins.</p>
+							<p>Адрес отчета: ${BUILD_URL}allure/</p>
+						''',
+						mimeType: 'text/html', 
+						from: 'Jenkins',
+						to: recipients,
+						attachLog: true
+				)
+			}
+		}
+		failure {
+			script {
+                def recipients = getMailRecipients('release')
+
+				echo 'Stage tests failed!'
+				emailext(
+						subject: 'Секция дымового тестирования упала.. и не выполнилась',
+						body: '''
+							<p>Pipeline "Дымовое тестирование" не выполнилось!</p>
+							<p>Подробности в логе.</p>
+						''',
+						mimeType: 'text/html',
+						from: 'Jenkins',
+						to: recipients,
+						attachLog: true
+				)
+                echo 'Pipeline failed!'
+			}
+		}
+    }
+}

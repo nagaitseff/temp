@@ -1,0 +1,318 @@
+def processedExt = 'false'
+def processedCf = 'false'
+
+def getMailRecipients(String groupName) {
+    def mailCfg = readJSON file: 'mailing-list.json', returnPojo: true
+    if (!mailCfg.containsKey(groupName)) {
+        error "Группа '${groupName}' не найдена в mailing-list.json"
+    }
+    return mailCfg[groupName].join(',')
+}
+
+def sendEmailNotification(String buildResult) {
+    def subject = "Pipeline: ${buildResult}"
+    def body = """<p>Pipeline: ${buildResult}.</p>
+                  <p>Подробности можно найти в Jenkins.</p>
+                  <p>Адрес: ${BUILD_URL}/</p>"""
+    def recipients = getMailRecipients('dev10p')
+    emailext(
+        subject: subject,
+        body: body,
+        mimeType: 'text/html',
+        from: 'Jenkins',
+        to: recipients,
+        attachLog: true
+    )
+}
+
+pipeline {
+    parameters {
+        string(name: 'LABEL', defaultValue: 'erp_nightly', description: 'Введите имя ноды для сборки проекта.')
+        string(name: 'CHECK_TIME', defaultValue: '"24 hours ago"', description: 'По-умолчанию "24 часа"')
+        booleanParam(name: 'NEED_BLOCK', defaultValue: true, description: 'Блокирование ИБ')
+        booleanParam(name: 'CREATE_CF', defaultValue: true, description: 'Собрать конфигурацию')
+        booleanParam(name: 'CREATE_EXT', defaultValue: true, description: 'Собрать расширение')
+        booleanParam(name: 'LOAD_CF', defaultValue: true, description: 'Загрузить конфигурацию')
+        booleanParam(name: 'LOAD_EXT', defaultValue: true, description: 'Загрузить расширение')
+        booleanParam(name: 'START_UPDATE', defaultValue: true, description: 'Запустить монопольное обновление')
+        booleanParam(name: 'ENABLE_LOG', defaultValue: false, description: 'Включить отладочные сообщения')
+    }
+
+    agent { label params.LABEL }
+
+    environment {
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+        BASH_PATH = 'C:\\Git\\bin\\bash.exe'
+        JSON_PATH = '\\\\ukm-sapp108\\artifacts\\origin\\develop_5405\\'
+        SCRIPT_COPY_CONSTANTS = '.\\tools\\OS\\CopyConstants.os'
+        SCRIPT_CHECK = '.\\tools\\OS\\CheckChangesInGit.os'
+        SCRIPT_CREATE_EXT = '.\\tools\\OS\\BuildExtension.os'
+        SCRIPT_CREATE_CF = '.\\tools\\OS\\auserv_scripts\\auserv_CheckFileCreate_10p.os'
+        SCRIPT_LOCK_UNLOCK_BASE = '.\\tools\\OS\\LockUnlockBase.os'
+        SCRIPT_LOAD_CF = '.\\tools\\OS\\LoadCf.os'
+        SCRIPT_LOAD_EXT = '.\\tools\\OS\\LoadExtension.os'
+        SCRIPT_START_AND_UPDATE = '.\\tools\\OS\\StartAndUpdate.os'
+        SCRIPT_CLEAN = '.\\tools\\OS\\CleanTemp.os'
+        SERVER_NAME = 'UKM-SAPP124'
+        CLUSTER_NAME = '124_clust_admin'
+        BASE_NAME = 'ERP_DEV_GORELOVDV'
+        PORT = '8541'
+        RELEASE_NUMBER = 'develop_5405'
+        DIR_NAME = 'develop_5405'
+        EXT_NAME = 'Mechel'
+        REPO_PATH = "."
+        LOCK = 'lock'
+        UNLOCK = 'unlock'
+        LOCK_FILE = "base_${env.BASE_NAME}.lock"
+        UNBLOCK_REG = 'true'
+
+        GIT_CREDENTIALS_ID = 'JenkinsReader'
+    }
+
+    stages {
+        stage('Debug Info') {
+            steps {
+                script {
+                    echo "[${env.BASE_NAME}] Build #${env.BUILD_NUMBER}, node=${env.NODE_NAME}"
+                    echo "[${env.BASE_NAME}] Params: CHECK_TIME=${params.CHECK_TIME}, CREATE_CF=${params.CREATE_CF}, CREATE_EXT=${params.CREATE_EXT}"
+                    echo "[${env.BASE_NAME}] LOAD_CF=${params.LOAD_CF}, LOAD_EXT=${params.LOAD_EXT}, START_UPDATE=${params.START_UPDATE}"
+                }
+            }
+        }
+        stage('Check and Checkout SCM') {
+            steps {
+                script {
+                    def branchName = "${env.RELEASE_NUMBER}"
+
+                    if (!branchName) {
+                        error("Имя ветки не указано.")
+                    }
+
+                    println("Устанавливаемая ветка: ${branchName}")
+
+                    try {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: branchName]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [[$class: 'CloneOption', timeout: 5400], [$class: 'CheckoutOption', timeout: 5400]],
+                            userRemoteConfigs: [[url: 'http://UKM-SAPP115/mechel/erp.git', credentialsId: env.GIT_CREDENTIALS_ID]]
+                        ])
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка переключения на ветку ${branchName}, база: ${env.BASE_NAME}"
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Constants') {
+            steps {
+                script {
+                    try {
+                        bat 'xcopy "\\\\ukm-sapp108\\ERP_Project\\mailing-list.json" "%WORKSPACE%\\" /Y'
+                        bat "IF EXIST \"${env.JSON_PATH}commits.json\" ( del /F /Q \"${env.JSON_PATH}commits.json\" )"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_COPY_CONSTANTS}"
+                        echo "[${env.BASE_NAME}] Константы подготовлены"
+                    } catch (Exception e) {
+                        echo "[${env.BASE_NAME}] Ошибка подготовки констант: ${e.getMessage()}"
+                        error(e.getMessage())
+                    }
+                }
+            }
+        }
+
+        stage('Needs create EXT') {
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CHECK} ${env.CHECK_TIME} РАСШИРЕНИЕ ИСТИНА"
+                        def filePath = "${WORKSPACE}/create_ext.txt"
+                        if (!fileExists(filePath)) { error("File ${filePath} not found") }
+                        def fileContentExt = readFile(filePath).trim()
+                        if (fileContentExt.isEmpty()) { error("Пустой файл create_ext.txt") }
+                        fileContentExt = fileContentExt.replaceAll("[^\\x20-\\x7E]", "")
+                        processedExt = fileContentExt == '1' ? "true" : "false"
+                        echo "[${env.BASE_NAME}] processedExt=${processedExt}"
+                    } catch (Exception e) {
+                        echo "[${env.BASE_NAME}] Ошибка проверки EXT: ${e.getMessage()}"
+                        error(e.getMessage())
+                    }
+                }
+            }
+        }
+
+        stage('Build EXT Mechel') {
+            when { expression { params.CREATE_EXT == true } }
+            steps {
+                script {
+                    if (processedExt.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CREATE_EXT} ${env.RELEASE_NUMBER} ${env.DIR_NAME} ${env.EXT_NAME} ${params.ENABLE_LOG}"
+                            echo "[${env.BASE_NAME}] Расширение собрано"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка сборки расширения, база ${env.BASE_NAME}: ${e.getMessage()}"
+                            echo "[${env.BASE_NAME}] ${errorMessage}"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage)
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Сборка EXT пропущена: изменений нет"
+                    }
+                }
+            }
+        }
+
+        stage('Needs create CF') {
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CHECK} ${env.CHECK_TIME} КОНФИГУРАЦИЯ ИСТИНА"
+                        def filePath = "${WORKSPACE}/create_cf.txt"
+                        if (!fileExists(filePath)) { error("File ${filePath} not found") }
+                        def fileContentCf = readFile(filePath).trim()
+                        if (fileContentCf.isEmpty()) { error("Пустой файл create_cf.txt") }
+                        fileContentCf = fileContentCf.replaceAll("[^\\x20-\\x7E]", "")
+                        processedCf = fileContentCf == '1' ? "true" : "false"
+                        echo "[${env.BASE_NAME}] processedCf=${processedCf}"
+                    } catch (Exception e) {
+                        echo "[${env.BASE_NAME}] Ошибка проверки CF: ${e.getMessage()}"
+                        error(e.getMessage())
+                    }
+                }
+            }
+        }
+
+        stage('Build CF') {
+            when { expression { params.CREATE_CF == true } }
+            steps {
+                script {
+                    if (processedCf.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CREATE_CF} ${WORKSPACE} configuration ${env.RELEASE_NUMBER}"
+                            echo "[${env.BASE_NAME}] Конфигурация собрана"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка сборки конфигурации, база ${env.BASE_NAME}: ${e.getMessage()}"
+                            echo "[${env.BASE_NAME}] ${errorMessage}"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage)
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Сборка CF пропущена: изменений нет"
+                    }
+                }
+            }
+        }
+
+        stage('Lock base & Kick users') {
+            when { expression { params.NEED_BLOCK == true } }
+            steps {
+                script {
+                    if (processedExt.toBoolean() || processedCf.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK_UNLOCK_BASE} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.LOCK}"
+                            writeFile file: "${env.LOCK_FILE}", text: 'locked'
+                            echo "[${env.BASE_NAME}] База заблокирована"
+                        } catch (Exception e) {
+                            echo "[${env.BASE_NAME}] Ошибка блокировки: ${e.getMessage()}"
+                            error(e.getMessage())
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Блокировка пропущена: изменений нет"
+                    }
+                }
+            }
+        }
+
+        stage('Load CF & Update') {
+            when { expression { params.LOAD_CF == true } }
+            steps {
+                script {
+                    if (processedCf.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_CF} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${env.RELEASE_NUMBER} ${env.DIR_NAME} ${params.ENABLE_LOG}"
+                            echo "[${env.BASE_NAME}] CF загружена"
+                        } catch (Exception e) {
+                            echo "[${env.BASE_NAME}] Ошибка загрузки CF: ${e.getMessage()}"
+                            error(e.getMessage())
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Загрузка CF пропущена"
+                    }
+                }
+            }
+        }
+
+        stage('Load EXT & Update') {
+            when { expression { params.LOAD_EXT == true } }
+            steps {
+                script {
+                    if (processedExt.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_EXT} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${env.RELEASE_NUMBER} ${env.DIR_NAME} ${env.EXT_NAME} ${params.ENABLE_LOG}"
+                            echo "[${env.BASE_NAME}] EXT загружено"
+                        } catch (Exception e) {
+                            echo "[${env.BASE_NAME}] Ошибка загрузки EXT: ${e.getMessage()}"
+                            error(e.getMessage())
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Загрузка EXT пропущена"
+                    }
+                }
+            }
+        }
+
+        stage('Start & Update') {
+            when { expression { params.START_UPDATE == true } }
+            steps {
+                script {
+                    if (processedExt.toBoolean() || processedCf.toBoolean()) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_START_AND_UPDATE} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT}"
+                            echo "[${env.BASE_NAME}] Монопольное обновление завершено"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка монопольного обновления, база ${env.BASE_NAME}: ${e.getMessage()}"
+                            echo "[${env.BASE_NAME}] ${errorMessage}"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage)
+                        }
+                    } else {
+                        echo "[${env.BASE_NAME}] Обновление пропущено"
+                    }
+                }
+            }
+        }
+
+        stage('Unlock base') {
+            when { expression { fileExists(env.LOCK_FILE) } }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK_UNLOCK_BASE} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.UNLOCK} ${env.UNBLOCK_REG}"
+                        bat "del \"${env.LOCK_FILE}\""
+                        echo "[${env.BASE_NAME}] База разблокирована"
+                    } catch (Exception e) {
+                        echo "[${env.BASE_NAME}] Ошибка разблокировки: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CLEAN} ${env.DIR_NAME} ${params.ENABLE_LOG}"
+                echo "[${env.BASE_NAME}] Статус: ${currentBuild.currentResult}"
+                emailext(
+                    subject: 'Pipeline "База 10П',
+                    body: '<p>Pipeline "База 10П, успешно собрана!</p><p>База: ${env.BASE_NAME}/</p>',
+                    mimeType: 'text/html',
+                    from: 'Jenkins',
+                    to: recipients,
+                    attachLog: true
+                )
+            }
+        }
+    }
+}

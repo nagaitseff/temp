@@ -1,0 +1,226 @@
+def notPassBuild = true
+
+def getMailRecipients(String groupName) {
+    def mailCfg = readJSON file: 'mailing-list.json', returnPojo: true
+    if (!mailCfg.containsKey(groupName)) {
+        error "Группа '${groupName}' не найдена в mailing-list.json"
+    }
+    return mailCfg[groupName].join(',')
+}
+
+def sendEmailNotification(String buildResult) {
+    def subject = "Pipeline: ${buildResult}"
+    def body = """<p>Pipeline: ${buildResult}.</p>
+                  <p>Подробности можно найти в Jenkins.</p>
+                  <p>Адрес: ${BUILD_URL}/</p>"""
+    def recipients = getMailRecipients('dev')
+    emailext(
+        subject: subject,
+        body: body,
+        mimeType: 'text/html',
+        from: 'Jenkins',
+        to: recipients,
+        attachLog: true
+    )
+}
+
+pipeline {
+    parameters {
+        string(
+            name: 'LABEL',
+            defaultValue: 'erp_nightly',
+            description: 'Введите имя ноды для сборки проекта.'
+        )
+        booleanParam(
+            name: 'ENABLE_LOG',
+            defaultValue: false,
+            description: 'Включить отладочные сообщения'
+        )
+    }
+
+    agent {label params.LABEL}
+
+    environment {
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+
+        // Переменные окружения
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+    
+        // Скрипты
+        SCRIPT_LOCK = '.\\tools\\OS\\LockUnlockBase.os'
+        SCRIPT_LOAD_CF = '.\\tools\\OS\\LoadCf.os'
+        SCRIPT_LOAD_EXT = '.\\tools\\OS\\LoadExtension.os'
+        SCRIPT_START_AND_UPDATE = '.\\tools\\OS\\StartAndUpdate.os'
+    
+        // Общие переменные окружения
+        SERVER_NAME = 'UKM-SAPP124'
+        CLUSTER_NAME = '124_clust_admin'
+        COMMAND_LOCK = 'lock'
+        COMMAND_UNLOCK = 'unlock'
+        BASE_NAME = 'ERP_MT_DEVELOP'
+        PORT = '7541'
+        PATH_NAME = 'develop'
+        EXT_NAME = 'Mechel'
+    }
+
+    stages {
+        stage('Debug Info') {
+            steps {
+                script {
+                    echo "[${env.BASE_NAME}]"
+                }
+            }
+        }
+        stage('Retrieve Artifacts') {
+            steps {
+                script {
+                    try {
+                        copyArtifacts(
+                            projectName: '01_erp_develop',
+                            filter: '**',
+                            excludes: 'allure/report/*, allure-report.zip',
+                            selector: lastCompleted()
+                        )
+                        echo "Артефакты успешно скопированы."
+                        env.ARTIFACTS_FOUND = "true"
+                    } catch (Exception e) {
+                        def errorMessage =  "Артефакты не найдены: ${e.message}"
+                        echo errorMessage
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Read Creating Artifacts') {
+            steps {
+                script {
+                    try {
+                        def status_ext = readFile('temp_status_ext.txt').trim()
+                        if (status_ext == "true") {
+                            env.COMMAND_CREATE_EXT = "true"
+                        } else {
+                            env.COMMAND_CREATE_EXT = "false"
+                        }
+                        echo "Есть изменения в расширении: ${env.COMMAND_CREATE_EXT}"
+                    } catch (Exception e) {
+                        errorMessage =  "Ошибка при чтении файла temp_status_ext.txt: ${e.message}"
+                        echo errorMessage
+                        error(errorMessage)
+                        sendEmailNotification(errorMessage)
+                    }
+                    try {
+                        def status_cf = readFile('temp_status_cf.txt').trim()
+                        if (status_cf == "true") {
+                            env.COMMAND_CREATE_CF = "true"
+                        } else {
+                            env.COMMAND_CREATE_CF = "false"
+                        }
+                        echo "Есть изменения в конфигурации: ${env.COMMAND_CREATE_CF}"
+                    } catch (Exception e) {
+                        errorMessage =  "Ошибка при чтении файла temp_status_cf.txt: ${e.message}"
+                        echo errorMessage
+                        sendEmailNotification(errorMessage)
+                    }
+                    if (env.COMMAND_CREATE_EXT == "false" && env.COMMAND_CREATE_CF == "false") {
+                        notPassBuild = false
+                    }
+                }
+            }
+        }
+        stage('Lock & Kick users') {
+            when {
+                expression { return notPassBuild }
+            }
+            steps {  
+                script {
+                    try {
+                        echo "Блокировка базы, удаление пользователей"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_LOCK}"
+                    } catch (Exception e) {
+                        errorMessage =  "Ошибка блокировки базы: ${e.message}"
+                        echo errorMessage
+                        error(errorMessage)
+                        sendEmailNotification(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Load CF & Apply') {
+            when {
+                expression { return notPassBuild }
+            }
+            steps {
+                script {
+                    if (env.COMMAND_CREATE_CF.toBoolean()) {
+                        try {
+                            echo "Загрузка файла конфигурации из ранее созданного"
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_CF} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${env.PATH_NAME} ${env.PATH_NAME} ${env.ENABLE_LOG}"
+                        } catch (Exception e) {
+                            errorMessage =  "Ошибка загрузки конфигурации: ${e.message}"
+                            echo errorMessage
+                            error(errorMessage)
+                            sendEmailNotification(errorMessage)
+                        }
+                    } else {
+                        echo "Изменений в конфигурации нет"
+                    }
+                }
+            }
+        }
+        stage('Load EXT & Apply') {
+            when {
+                expression { return notPassBuild }
+            }
+            steps {
+                script {
+                    if (env.COMMAND_CREATE_EXT.toBoolean()) {
+                        try {
+                            echo "Загрузка расширений из ранее созданного"
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_EXT} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${env.PATH_NAME} ${env.PATH_NAME} ${env.EXT_NAME} ${env.ENABLE_LOG}"
+                        } catch (Exception e) {
+                            errorMessage =  "Ошибка загрузки расширения: ${e.message}"
+                            echo errorMessage
+                            error(errorMessage)
+                            sendEmailNotification(errorMessage)
+                        }
+                    } else {
+                        echo "Нет изменений в расширении"
+                    }
+                }
+            }
+        }
+        stage('Start & Update') {
+            when {
+                expression { return notPassBuild }
+            }
+            steps {
+                script {
+                    if (env.COMMAND_CREATE_CF.toBoolean() || env.COMMAND_CREATE_EXT.toBoolean()) {
+                        echo "Запуск 1С Предприятия с монопольным обновлением"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_START_AND_UPDATE} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT}"
+                    } else {
+                        echo "Изменений в конфигурации и расширении нет. Пропуск."
+                    }
+                }
+            }
+        }
+        stage('Unlock') {
+            when {
+                expression { return notPassBuild }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Разблокировка базы"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_UNLOCK}"
+                    } catch (Exception e) {
+                        errorMessage =  "Ошибка разблокировки базы: ${e.message}"
+                        echo errorMessage
+                        error(errorMessage)
+                        sendEmailNotification(errorMessage)
+                    }
+                }
+            }
+        }
+    }
+}

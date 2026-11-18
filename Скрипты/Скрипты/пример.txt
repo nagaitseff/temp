@@ -1,0 +1,182 @@
+@Library('1c-utils')
+
+import io.libs.v8_utils
+
+def utils = new v8_utils()
+def now = new Date()
+def returnCode = 0
+def rabbitConfig = 'ukm-rmq-test'
+currentBuild.displayName = env.source_base + " to " + env.destination_base
+
+pipeline{
+    agent { label "erp"}
+    stages{
+        stage('Begin'){
+            steps {
+                script {
+                    now = new Date()
+                    rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"BEGIN"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                }
+            }
+        }
+        stage('Restore DB'){
+            steps{
+                script{
+                    now = new Date()
+                    def buildUser = currentBuild.getBuildCauses()[0]?.userName ?: "SYSTEM"
+                    def token = env.token
+                    def sourceBase = env.source_base
+                    def destinationBase = env.destination_base
+                    def makecopy = env.makecopy?.trim() == '1' ? 1 : 0
+                    def systemComment = """Jenkins: job=${env.JOB_NAME} #${env.BUILD_NUMBER}"""
+                    def externalComment = env.comment.trim() ?: ""
+                    def comment = [
+                        systemComment,
+                        externalComment
+                    ]
+                    .findAll { it?.trim() }
+                    .join(" | ")
+                
+                    env.RESTORE_TOKEN = token
+                    env.RESTORE_GUID = utils.newLoading1C(token, sourceBase, destinationBase, makecopy, comment)
+                }
+                sleep(1)
+                rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"Восстанавливаю базу"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+            }
+        }
+        stage('Restore DB Status') {
+            steps {
+                script {
+                    def sentStatuses = [:]
+                    def sendIfChanged = {key, message ->
+                        if (!sentStatuses[key]) {
+                            sentStatuses[key] = true
+                            sleep(1)
+                            now = new Date()
+                            rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"'+message+'"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                        }
+                    }
+                    timeout(time: 2, unit: 'HOURS') {
+                        waitUntil {
+                            def status = utils.statusLoading1C(
+                                env.RESTORE_TOKEN,
+                                env.RESTORE_GUID
+                                )
+                                if (status == 0) {
+                                    sendIfChanged("DONE", "Восстановление завершено")
+                                    echo "Восстановление завершено"
+                                    return true
+                                }
+                                
+                                if (status == -1) {
+                                    
+                                    sendIfChanged("ERROR", "Восстанавление завершилось с ошибкой")
+                                    error "Восстановление завершилось с ошибкой"
+                                }
+                                
+                                if (status == 1) {
+                                    
+                                    sendIfChanged("RUNNING", "В процессе...")
+                                    echo "В процессе..."
+                                }
+                                
+                                if (status == 2) {
+                                    
+                                    sendIfChanged("PAUSED", "Приостановлено, дождитесь действия администраторов СУБД")
+                                    echo "Приостановлено... дождитесь действия администраторов СУБД"
+                                }
+                                sleep 60
+                                return false
+                        }
+                    }
+                }
+            }
+        }
+        stage('Сброс пароля пользователя') {
+            steps{
+        	    script{
+        	        def destinationBase = env.destination_base
+        	        def ibconnection = "/S" + destinationBase.replaceAll("\\|", "/")
+            	    if (env.needpasswordreset == '+'){
+            	        sleep(1)
+                        now = new Date()
+            	        rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"Сбрасываю пароль"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                		fileOperations([fileDeleteOperation(excludes: '', includes: 'EnableIBAccess*.txt')])
+                		def command = "USER=${env.user};PASSWORD=${env.password};LOGDIRECTORY=${env.WORKSPACE};SystemShutdown"
+                	    
+            	        returnCode = utils.cmd('runner run --execute "C:\\1C_ExtReps\\EnableIBAccess.epf" --command "'+command+'" --settings c:\\1C_ExtReps\\vrunner.json --ibconnection ' + ibconnection)
+                        if (returnCode != 0) {
+                            sleep(10)
+                            returnCode = utils.cmd('runner run --execute "C:\\1C_ExtReps\\EnableIBAccess.epf" --command "'+command+'" --settings c:\\1C_ExtReps\\vrunner.json --ibconnection ' + ibconnection)
+                        }
+                	    if (returnCode != 0) {
+                            sleep(1)
+                            now = new Date()
+                            rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"База актуализирована, пароль не сброшен"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                            error 'Что-то пошло не так с запуском обработки EnableIBAccess'
+                        }else{
+                            myresult = fileExists "EnableIBAccessErr.txt"    
+                            if (myresult) {
+                                errorDescription = readFile (file: 'EnableIBAccessLog.txt')
+                                sleep(1)
+                                now = new Date()
+                                rabbitMQPublisher conversion: false,data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"ОШИБКА: '+errorDescription+'"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                                error errorDescription
+                            }else{
+                                sleep(1)
+                                script{now = new Date()}
+                                rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"Сбросил пароль"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                            }
+                        }
+        		    }else{
+        		        sleep(1)
+        		        script{now = new Date()}
+        		        rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"Сброс пароля не требуется"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+        		    }
+                }
+            }
+        }
+    }
+    post{
+        success{
+            script{
+                sleep(1)
+                now = new Date()
+            }
+            rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"SUCCESS"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+        }
+        failure{
+            script{
+                sleep(1)
+                now = new Date()
+                if (fileExists("log.txt")){
+                    errorDescription = readFile (encoding: 'windows-1251', file: 'log.txt')
+                    rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"ERROR:"'+errorDescription+'}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+                }
+                sleep(1)
+                now = new Date()
+            }
+            rabbitMQPublisher conversion: false, data: '{"timestamp":"'+now.format("yyyy-MM-dd'T'HH:mm:ss")+'","base_GUID":"'+env.base_GUID+'","project":"any_base_restore","status":"FAILURE"}', exchange: 'jenkins', rabbitName: rabbitConfig, routingKey: 'any_base_restore', toJson: false
+        }
+        always{
+            script{
+                if (fileExists("sqlcmd_log.txt")){
+                    errorDescription = readFile (encoding: 'windows-1251', file: 'sqlcmd_log.txt')
+                    println("sqlcmd_log.txt:")
+                    println(errorDescription)
+                }
+                if (fileExists("log.txt")){
+                    errorDescription = readFile (encoding: 'windows-1251', file: 'log.txt')
+                    println("log.txt:")
+                    println(errorDescription)
+                }
+                 if (fileExists("EnableIBAccessLog.txt")){
+                    errorDescription = readFile (encoding: 'utf-8', file: 'EnableIBAccessLog.txt')
+                    println("EnableIBAccessLog.txt:")
+                    println(errorDescription)
+                }
+           }
+           fileOperations([fileDeleteOperation(excludes: '', includes: '*.txt')])
+        }
+    }
+}

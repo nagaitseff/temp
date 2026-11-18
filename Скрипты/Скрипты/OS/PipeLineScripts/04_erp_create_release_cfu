@@ -1,0 +1,320 @@
+def processedReleaseName = ''
+def processedReleaseNumber = ''
+def processedExt = '0'
+def processedCf = '0'
+
+def getMailRecipients(String groupName) {
+    def mailCfg = readJSON file: 'mailing-list.json', returnPojo: true
+
+    if (!mailCfg.containsKey(groupName)) {
+        error "Группа '${groupName}' не найдена в mailing-list.json"
+    }
+
+    return mailCfg[groupName].join(',')
+}
+
+def sendEmailNotification(String buildResult) {
+
+        def subject = "Pipeline: ${buildResult}"
+        def body = """<p>Pipeline: ${buildResult}.</p>
+                      <p>Подробности можно найти в Jenkins.</p>
+                      <p>Адрес: ${BUILD_URL}/</p>"""
+        
+        def recipients = getMailRecipients('release')
+        
+        emailext(
+            subject: subject,
+            body: body,
+            mimeType: 'text/html',
+            from: 'Jenkins',
+            to: recipients,
+            attachLog: true
+        )
+}
+
+def isBranchNameValid(String branchName) {
+    def releasePattern = ~/^release\/\d+\.\d+\.\d+\.\d+$/
+    def hotfixPattern = ~/^hotfix\/\d+\.\d+\.\d+\.\d+_\d{2}$/
+    return branchName ==~ releasePattern || branchName ==~ hotfixPattern
+}
+
+pipeline {
+
+    parameters {
+        string(
+            name: 'BRANCH_NAME',
+            defaultValue: 'release/',
+            description: 'Введите номер релиза'
+        )
+        string(
+            name: 'LABEL',
+            defaultValue: 'erp_325',
+            description: 'Введите имя ноды для сборки проекта. Ноды проекта ЕРП (erp, erp_325)'
+        )
+        booleanParam(
+            name: 'CREATE_CFU',
+            defaultValue: true,
+            description: 'Собрать файл конфигурации и файл поставки'
+        )
+        string(
+            name: 'EXT_NAME',
+            defaultValue: 'Mechel',
+            description: 'По-умолчанию "Mechel"'
+        )
+        string(
+            name: 'CHECK_TIME',
+            defaultValue: '"6 hours ago"',
+            description: 'По-умолчанию "6 часов"'
+        )
+        booleanParam(
+            name: 'ENABLE_LOG',
+            defaultValue: false,
+            description: 'Включить отладочные сообщения'
+        )
+    }
+
+    agent {label params.LABEL}
+    
+    environment {
+
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+
+        // Переменные окружения
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+       
+		// Скрипты
+        SCRIPT_CHECK = '.\\tools\\OS\\CheckChangesInGit.os'
+        SCRIPT_LOCK = '.\\tools\\OS\\LockUnlockBase.os'
+        SCRIPT_LOAD_CF_FROM_FILES = '.\\tools\\OS\\erp_create_release_cfu\\LoadCfFromFiles.os'
+        SCRIPT_CREATE_SUPPLY_FILES = '.\\tools\\OS\\erp_create_release_cfu\\CreateSupplyCf.os'
+		SCRIPT_CREATE_EXT = '.\\tools\\OS\\BuildExtension.os'
+        SCRIPT_LOAD_EXT = '.\\tools\\OS\\LoadExtension.os'
+
+		SCRIPT_CLEAN = '.\\tools\\OS\\CleanTemp.os'
+		
+		// Общие переменные окружения
+		SERVER_NAME = 'UKM-SAPP145'
+        BASE_NAME = 'ERP_RELEASE'
+        PORT = '2541'
+		CLUSTER_NAME = '145_clust_admin'
+        COMMAND_LOCK = 'lock'
+        COMMAND_UNLOCK = 'unlock'
+        ID_GROUP = "-1002228562819"
+        ID_THEME = "1396"
+
+        GIT_CREDENTIALS_ID = 'JenkinsReader'
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                script {
+                    try {
+                        echo "Подготовка файла адресатов почты"
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\mailing-list.json" "%WORKSPACE%\\" /Y
+                        '''
+                    } catch (Exception e) {
+                            def errorMessage = "Ошибка копирования файла констант: ${e.getMessage()}, база: ${params.BASE_NAME}"
+                            error(errorMessage)
+                    }
+                    try {
+                        echo "Подготовка файла констант"
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\ConstantsForJobs.json" "%WORKSPACE%\\" /Y
+                        '''
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка копирования файла констант: ${e.getMessage()}, база: ${env.BASE_NAME}"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Check and Checkout SCM') {
+            steps {
+                script {
+                    def branchName = "${env.BRANCH_NAME}"
+
+                    if (!branchName) {
+                        error("Имя ветки не указано.")
+                    }
+
+                    println("Устанавливаемая ветка: ${branchName}")
+
+                    if (!isBranchNameValid(branchName)) {
+                        def errorMessage = "Некорректное имя ветки: ${branchName}. Ожидается формат release/X.X.X.X или hotfix/X.X.X.X"
+                        println(errorMessage)
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+
+                    try {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: branchName]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [[$class: 'CloneOption', timeout: 5400], [$class: 'CheckoutOption', timeout: 5400]],
+                            userRemoteConfigs: [[url: 'http://UKM-SAPP115/mechel/erp.git', credentialsId: env.GIT_CREDENTIALS_ID]]
+                        ])
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка переключения на ветку ${branchName}, база: ${env.BASE_NAME}"
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Установка параметров') {
+            steps {
+                script {
+                    try {
+                        echo "Начинаем работу с базой: ${env.BASE_NAME}"
+                        writeFile file: 'triggers.txt', text: 'ERP_UNION_YKUZ_STAGING, ERP_UNION_YU_STAGING, ERP_UNION_KGOK_STAGING'
+                        writeFile file: 'branch_name.txt', text: "${env.BRANCH_NAME}"
+
+                        def originalReleaseNumber = "${env.BRANCH_NAME}"
+                        def parts = originalReleaseNumber.split('/')
+                        if (parts.size() >= 2) {
+                            processedReleaseName = parts[0]
+                            processedReleaseNumber = parts[1]
+                            
+                            echo "Извлеченное значение имени: ${processedReleaseName}"
+                            echo "Извлеченное значение номера: ${processedReleaseNumber}"
+
+                        } else {
+                            def errorMessage = "Ошибка: Ожидались две части в строке, разделенные '/'"
+                            sendEmailNotification(errorMessage)
+                            error(errorMessage) 
+                        }
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CHECK} ${env.CHECK_TIME} РАСШИРЕНИЕ ИСТИНА"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CHECK} ${env.CHECK_TIME} КОНФИГУРАЦИЯ ИСТИНА"
+                    } catch (Exception e) {
+                        def errorMessage = e.getMessage()
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        stage('Блокировка базы') {
+			steps {
+				script {
+                    try {
+                        echo "Блокировка базы, удаление пользователей"
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_LOCK}"
+                    } catch (Exception e) {
+                        def errorMessage = e.getMessage()
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+        
+        stage('Загрузка файлов конфигурации') {
+            when { 
+				expression { params.CREATE_CFU == true } 
+			}
+            steps {
+                script {
+                    try {
+                        echo "Проверка наличия файла create_cf.txt"
+                        def filePath = './create_cf.txt'
+                        if (fileExists(filePath)) {
+                            echo "Файл найден. Чтение содержимого..."
+                            def fileContent = readFile(filePath).trim()
+                            fileContent = fileContent.replaceAll("[^\\x20-\\x7E]", "")
+                            echo "Содержимое файла возможности создания конфигурации: '${fileContent}'"
+                            if (fileContent == '1') {
+                                echo "Содержимое: Да. Выполнение команды..."
+                                bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_CF_FROM_FILES} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${params.ENABLE_LOG}"
+                                processedCf = '1'
+                            } else {
+                                echo "Содержимое: Нет. Пропуск выполнения."
+                            }
+                        } else {
+                            echo "Файл create_cf.txt не найден. Пропуск выполнения."
+                        }
+                    } catch (Exception e) {
+                        def errorMessage = e.getMessage()
+                        sendEmailNotification(errorMessage)
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Создание CFU') {
+            when { 
+				expression { params.CREATE_CFU == true } 
+			}
+            steps {
+                script {
+                    if (processedCf == '1') {
+					    echo "Создание файлов поставки cf и cfu"
+					    bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CREATE_SUPPLY_FILES} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${processedReleaseNumber} ${processedReleaseName} ${env.ENABLE_LOG}"
+                    }
+                }
+            }
+        }
+
+        stage('Сборка расширения') {
+            steps {
+                script {
+                    echo "Проверка наличия файла create_ext.txt"
+                    def filePath = './create_ext.txt'
+                    if (fileExists(filePath)) {
+                        echo "Файл найден. Чтение содержимого..."
+                        def fileContent = readFile(filePath).trim()
+                        fileContent = fileContent.replaceAll("[^\\x20-\\x7E]", "")
+                        echo "Содержимое файла возможности создания расширения: '${fileContent}'"
+                        if (fileContent == '1') {
+                            echo "Содержимое: Да. Выполнение команды..."
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CREATE_EXT} ${processedReleaseNumber} ${processedReleaseName} ${params.EXT_NAME} ${params.ENABLE_LOG}"
+                            processedExt = '1'
+                        } else {
+                            echo "Содержимое: Нет. Пропуск выполнения."
+                        }
+                    } else {
+                        echo "Файл create_ext.txt не найден. Пропуск выполнения."
+                    }
+                }
+            }
+        }
+
+        stage('Загрузка файла расширения + применение') {
+            steps {
+                script {
+                    if (processedExt == '1') {
+					    echo "Загрузка расширения из ранее созданного файла + приминение"
+					    bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_EXT} ${env.SERVER_NAME} ${env.BASE_NAME} ${env.PORT} ${processedReleaseNumber} ${processedReleaseName} ${params.EXT_NAME} ${params.ENABLE_LOG}"
+                    }
+                }
+            }
+        }
+
+        stage('Разблокировка') {
+            steps {
+                script {
+                    echo "Разблокировка базы"
+                    bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${env.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_UNLOCK}"
+                }
+            }
+        }
+    }
+	
+	post {
+        always {
+            archiveArtifacts artifacts: 'triggers.txt, branch_name.txt, create_ext.txt, create_cf.txt'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CLEAN} ${env.DIR_NAME} ${params.ENABLE_LOG}"
+        }
+        failure {
+            sendEmailNotification("Ошибка сборки erp_release_cfu, ветка: ${env.BRANCH_NAME}, база ${env.BASE_NAME}")
+            echo 'Pipeline failed!'
+        }
+    }
+}

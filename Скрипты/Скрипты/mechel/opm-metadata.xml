@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<opm-metadata xmlns="http://oscript.io/schemas/opm-metadata/1.0">
+    <name>mechel</name>
+    <version>1.1.2</version>
+    <author>Eugene Nagaitsev</author>
+    <author-email>NagaytsevEP@mechel.com</author-email>
+    <description>Библиотеки для работы с репозиторием и различными сборками конфигураций.</description>
+    <engine-version>1.9.1</engine-version>
+    <depends-on name="json" dev="false" version="1.1.1"/>
+    <depends-on name="v8runner" dev="false" version="1.9.1"/>
+    <depends-on name="asserts" dev="false" version="1.4.0"/>
+    <depends-on name="fs" dev="false" version="1.2.0"/>
+    <depends-on name="oint" dev="false" version="1.6.0"/>
+</opm-metadata>

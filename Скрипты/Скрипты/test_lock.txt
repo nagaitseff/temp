@@ -1,0 +1,99 @@
+@Library('1c-utils')
+
+import io.libs.v8_utils
+
+def utils = new v8_utils()
+
+pipeline {
+    parameters {
+        string(
+            name: 'LABEL',
+            defaultValue: 'erp_nightly',
+            description: 'Введите имя ноды для сборки проекта.'
+        )
+        string(
+            name: 'CHECK_TIME',
+            defaultValue: '24 hours ago',
+            description: 'По умолчанию 24 часа'
+        )
+        booleanParam(
+            name: 'NEED_BLOCK',
+            defaultValue: true,
+            description: 'Блокирование ИБ'
+        )
+        credentials(
+            name: 'TOKEN',
+            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+            defaultValue: 'erp-restore-api-token',
+            required: true,
+            description: 'API-токен для блокировки информационной базы'
+        )
+    }
+
+    agent {
+        label "${params.LABEL}"
+    }
+
+    environment {
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+        BASH_PATH = 'C:\\Git\\bin\\bash.exe'
+        BASE_NAME = 'ERP_UNION_YU_STAGING'
+        REPO_PATH = '.'
+        LOCK = '789789789'
+        LOCK_FILE = "base_${env.BASE_NAME}.lock"
+        UNBLOCK_REG = 'true'
+    }
+
+    stages {
+        stage('Lock base & Kick users') {
+            when {
+                expression {
+                    params.NEED_BLOCK == true
+                }
+            }
+
+            steps {
+                script {
+                    def now = new Date()
+                    def threeHoursLater = new Date(now.time + 3 * 60 * 60 * 1000)
+
+                    def sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    def lockBeginTimeStr = sdf.format(now)
+                    def lockEndTimeStr = sdf.format(threeHoursLater)
+
+                    withCredentials(
+                        [string(
+                            credentialsId: params.TOKEN,
+                            variable: 'RESTORE_TOKEN'
+                        )]
+                    ) {
+                        try {
+                            utils.setInfobaseBlock(
+                                RESTORE_TOKEN,
+                                env.BASE_NAME,
+                                true,
+                                lockBeginTimeStr,
+                                lockEndTimeStr,
+                                env.LOCK,
+                                'Установка плановых обновлений',
+                                null,
+                                true
+                            )
+
+                            writeFile(
+                                file: env.LOCK_FILE,
+                                text: 'locked'
+                            )
+
+                            echo "[${env.BASE_NAME}] База заблокирована"
+                        } catch (Exception e) {
+                            echo "[${env.BASE_NAME}] Ошибка блокировки: ${e.message}"
+                            error(e.message)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

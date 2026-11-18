@@ -1,0 +1,115 @@
+﻿pipeline {
+    agent { label 'erp_325' }
+
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 1, unit: 'HOURS')
+    }
+
+    stages {
+        stage('Copy artifacts from develop') {
+            steps {
+                dir('tools') {
+                    deleteDir()
+                }
+                copyArtifacts(
+                    projectName: '01_erp_develop',
+                    filter: 'temp_status_ext.txt,temp_status_cf.txt,draft_triggers.txt,draft_label.txt,draft_update_enabled.txt,tools/**',
+                    selector: upstream(fallbackToLastSuccessful: true),
+                    flatten: false
+                )
+
+                archiveArtifacts(
+                    artifacts: 'tools/**',
+                    allowEmptyArchive: false,
+                    defaultExcludes: false
+                )
+            }
+        }
+
+        stage('Read artifacts') {
+            steps {
+                script {
+                    def processedExt = readFile('temp_status_ext.txt').trim()
+                    def processedCf = readFile('temp_status_cf.txt').trim()
+                    def triggers = readFile('draft_triggers.txt').trim()
+                    def label = readFile('draft_label.txt').trim()
+                    def updateDraft = readFile('draft_update_enabled.txt').trim().toBoolean()
+
+                    env.PROCESSED_EXT = processedExt
+                    env.PROCESSED_CF = processedCf
+                    env.DRAFT_TRIGGERS = triggers
+                    env.DRAFT_LABEL = label
+                    env.DRAFT_UPDATE_ENABLED = updateDraft.toString()
+
+                    echo "processedExt=${processedExt}"
+                    echo "processedCf=${processedCf}"
+                    echo "triggers=${triggers}"
+                    echo "label=${label}"
+                    echo "updateDraft=${updateDraft}"
+                }
+            }
+        }
+
+        stage('Sequential Trigger with Delay') {
+            when {
+                expression { env.DRAFT_UPDATE_ENABLED == 'true' }
+            }
+            steps {
+                script {
+                    def loadCf = env.PROCESSED_CF.toBoolean()
+                    def loadExt = env.PROCESSED_EXT.toBoolean()
+
+                    if (!loadCf && !loadExt) {
+                        echo "No updates found. Nothing to trigger."
+                        return
+                    }
+
+                    def values = env.DRAFT_TRIGGERS.split(',')
+                        .collect { it.trim() }
+                        .findAll { !it.isEmpty() }
+
+                    if (values.size() == 0) {
+                        error "STOPPING: draft_triggers.txt is empty."
+                    }
+
+                    echo "Found ${values.size()} bases to process: ${values.join(', ')}"
+                    echo "LOAD_CF=${loadCf}, LOAD_EXT=${loadExt}, LABEL=${env.DRAFT_LABEL}"
+
+                    values.eachWithIndex { val, index ->
+                        if (index > 0) {
+                            echo "Ожидание 1 минуту перед запуском базы [${val}]..."
+                            sleep time: 5, unit: 'MINUTES'
+                        }
+
+                        echo "[${val}] STARTING build"
+
+                        build job: '03_erp_release_draft',
+                            wait: false,
+                            parameters: [
+                                string(name: 'BASE_NAME', value: val),
+                                string(name: 'LABEL', value: env.DRAFT_LABEL),
+                                string(name: 'TOOLS_SOURCE_JOB', value: env.JOB_NAME),
+                                string(name: 'TOOLS_SOURCE_BUILD', value: env.BUILD_NUMBER),
+                                booleanParam(name: 'LOAD_CF', value: loadCf),
+                                booleanParam(name: 'LOAD_EXT', value: loadExt),
+                                booleanParam(name: 'SEND_MESSAGE', value: false),
+                                booleanParam(name: 'ENABLE_LOG', value: false)
+                            ]
+                    }
+
+                    echo "Все целевые базы были успешно запущены в фоне."
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "All bases triggered successfully"
+        }
+        failure {
+            echo "Pipeline failed to trigger bases"
+        }
+    }
+}

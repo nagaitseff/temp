@@ -1,0 +1,334 @@
+﻿@Library('1c-utils') _
+
+import io.libs.v8_utils
+
+def utils = new v8_utils()
+
+def ARTIFACTS_DIR = '\\\\ukm-sapp108\\artifacts'
+
+def branchNameRaw = env.branchName
+def previousBranchName = env.previousBranchName ?: ''
+def previousRemote = 'refs/tags'
+
+def autonomousIbDir = ''
+def autonomousExtDir = ''
+def extBaseDir = ''
+def cfBaseDir = ''
+
+def debugBuild1C = false
+def cfeName = 'Mechel.cfe'
+
+def outputdir = ''
+def logResult = ''
+def textStatus = ''
+
+if (previousBranchName.startsWith('origin/')) {
+    previousRemote = 'origin'
+    previousBranchName = previousBranchName.substring('origin/'.length())
+} else if (previousBranchName.startsWith('refs/tags/')) {
+    previousBranchName = previousBranchName.substring('refs/tags/'.length())
+}
+
+pipeline {
+    agent {
+        label 'erp_325'
+    }
+
+    parameters {
+        booleanParam(
+            name: 'DEBUG_BUILD_1C',
+            defaultValue: false,
+            description: 'Подробное логирование сборки CF/CFE и сохранение временных каталогов autonomous_ib и autonomous_ext_ib'
+        )
+    }
+
+    stages {
+        stage('Init') {
+            steps {
+                script {
+                    if (!branchNameRaw?.trim()) {
+                        error('Не заполнена переменная branchName')
+                    }
+
+                    debugBuild1C = params.DEBUG_BUILD_1C
+
+                    autonomousIbDir = "${env.WORKSPACE}\\autonomous_ib"
+                    autonomousExtDir = "${env.WORKSPACE}\\autonomous_ext_ib"
+                    extBaseDir = "${env.WORKSPACE}\\ext_base"
+                    cfBaseDir = "${env.WORKSPACE}\\cf_base"
+
+                    outputdir = ARTIFACTS_DIR + '\\' +
+                        branchNameRaw.replace('/', '\\')
+
+                    currentBuild.displayName = branchNameRaw
+
+                    echo "[INFO] Ветка: ${branchNameRaw}"
+                    echo "[INFO] Ветка/тег сравнения: ${previousBranchName}"
+                    echo "[INFO] Источник сравнения: ${previousRemote}"
+                    echo "[INFO] buildCF = ${env.buildCF}"
+                    echo "[INFO] buildEXT = ${env.buildEXT}"
+                    echo "[INFO] DEBUG_BUILD_1C = ${debugBuild1C}"
+                    echo "[INFO] WORKSPACE = ${env.WORKSPACE}"
+                    echo "[INFO] Каталог артефактов = ${outputdir}"
+
+                    logResult += "Ветка = ${branchNameRaw}\n"
+                    logResult += "buildCF = ${env.buildCF}\n"
+                    logResult += "buildEXT = ${env.buildEXT}\n"
+                    logResult += "DEBUG_BUILD_1C = ${debugBuild1C}\n"
+                    logResult += "WORKSPACE = ${env.WORKSPACE}\n"
+                    logResult += "autonomousIbDir = ${autonomousIbDir}\n"
+                    logResult += "autonomousExtDir = ${autonomousExtDir}\n"
+                    logResult += "Каталог артефактов = ${outputdir}\n"
+                    logResult += '----------------------\n'
+
+                    erp_library.cleanupPath(
+                        "${env.WORKSPACE}\\result.txt",
+                        false
+                    )
+                }
+            }
+        }
+
+        stage('Checkout GIT') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [
+                        [name: branchNameRaw]
+                    ],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [
+                        [
+                            $class: 'ChangelogToBranch',
+                            options: [
+                                compareRemote: previousRemote,
+                                compareTarget: previousBranchName
+                            ]
+                        ]
+                    ],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [
+                        [
+                            credentialsId: 'ee260d51-5e0a-4d3a-abcf-dc10ac1c0f4d',
+                            url: 'http://ukm-sapp115/mechel/erp.git'
+                        ]
+                    ]
+                ])
+
+                fileOperations([
+                    folderCreateOperation(outputdir)
+                ])
+
+                script {
+                    logResult += 'Получили изменения из репозитория Git\n'
+                    logResult += '----------------------\n'
+                }
+            }
+        }
+
+        stage('Build CF') {
+            when {
+                expression {
+                    env.buildCF == 'true'
+                }
+            }
+
+            steps {
+                script {
+                    logResult += 'Сборка основной конфигурации:\n'
+
+                    catchError(
+                        message: 'Ошибка при сборке основной конфигурации',
+                        buildResult: 'FAILURE',
+                        stageResult: 'FAILURE'
+                    ) {
+                        // Подготовка относится только к сборке CF.
+                        erp_library.cleanupPath(cfBaseDir, true)
+
+                        if (!debugBuild1C) {
+                            erp_library.cleanupPath(
+                                autonomousIbDir,
+                                true
+                            )
+
+                            logResult += 'Каталог autonomous_ib очищен перед сборкой CF\n'
+                        } else {
+                            logResult += 'DEBUG: очистка autonomous_ib перед сборкой CF пропущена\n'
+                        }
+
+                        def artifactPath =
+                            erp_library.buildCfFromXmlAndPublish(
+                                branchName: branchNameRaw,
+                                debugLog: debugBuild1C
+                            )
+
+                        logResult += "Основная конфигурация собрана и опубликована: ${artifactPath}\n"
+                    }
+
+                    logResult += '----------------------\n'
+                }
+            }
+
+            post {
+                always {
+                    script {
+                        catchError(
+                            message: 'Ошибка очистки cf_base после сборки CF',
+                            buildResult: 'FAILURE',
+                            stageResult: 'FAILURE'
+                        ) {
+                            erp_library.cleanupPath(cfBaseDir, true)
+                        }
+
+                        if (!debugBuild1C) {
+                            catchError(
+                                message: 'Ошибка очистки autonomous_ib после сборки CF',
+                                buildResult: 'FAILURE',
+                                stageResult: 'FAILURE'
+                            ) {
+                                erp_library.cleanupPath(
+                                    autonomousIbDir,
+                                    true
+                                )
+
+                                logResult += 'Каталог autonomous_ib очищен после сборки CF\n'
+                            }
+                        } else {
+                            logResult += 'DEBUG: очистка autonomous_ib после сборки CF пропущена\n'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build EXT') {
+            when {
+                expression {
+                    env.buildEXT == 'true'
+                }
+            }
+
+            steps {
+                script {
+                    logResult += 'Сборка расширения\n'
+
+                    catchError(
+                        message: 'Ошибка при сборке расширения',
+                        buildResult: 'FAILURE',
+                        stageResult: 'FAILURE'
+                    ) {
+                        // Перед сборкой удаляем старый ext_base.
+                        erp_library.cleanupPath(extBaseDir, true)
+
+                        logResult += 'Каталог ext_base очищен перед сборкой расширения\n'
+
+                        utils.buildCF(
+                            'src\\cfe\\Mechel',
+                            'ext_base',
+                            cfeName,
+                            'Mechel'
+                        )
+
+                        // Публикуем расширение только после успешной сборки.
+                        fileOperations([
+                            fileCopyOperation(
+                                excludes: '',
+                                flattenFiles: true,
+                                includes: cfeName,
+                                targetLocation: outputdir
+                            )
+                        ])
+
+                        logResult += "Расширение опубликовано: ${outputdir}\\${cfeName}\n"
+                    }
+
+                    // Ошибка отсутствующего log.txt не должна маскировать
+                    // первоначальную ошибку сборки.
+                    if (fileExists('log.txt')) {
+                        def logstep = readFile(file: 'log.txt')
+                        logResult += logstep
+                    } else {
+                        logResult += 'Файл log.txt отсутствует\n'
+                    }
+
+                    logResult += '----------------------\n'
+                }
+            }
+
+            post {
+                always {
+                    script {
+                        catchError(
+                            message: 'Ошибка очистки ext_base после сборки расширения',
+                            buildResult: 'FAILURE',
+                            stageResult: 'FAILURE'
+                        ) {
+                            erp_library.cleanupPath(extBaseDir, true)
+
+                            logResult += 'Каталог ext_base очищен после сборки расширения\n'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                textStatus = 'OK'
+            }
+        }
+
+        failure {
+            script {
+                textStatus = 'ERR'
+            }
+        }
+
+        always {
+            script {
+                writeFile(
+                    encoding: 'UTF-8',
+                    file: 'result.txt',
+                    text: logResult
+                )
+
+                archiveArtifacts(
+                    allowEmptyArchive: true,
+                    artifacts: 'result.txt, log.txt, autonomous_ib/**/*.log, autonomous_ib/**/*.txt, autonomous_ext_ib/**/*.log, autonomous_ext_ib/**/*.txt',
+                    caseSensitive: false,
+                    fingerprint: true,
+                    followSymlinks: false
+                )
+            }
+        }
+
+        cleanup {
+            script {
+                echo 'Очищаем временные каталоги и файлы'
+
+                if (!debugBuild1C) {
+                    erp_library.cleanupPath(autonomousIbDir, true)
+                    erp_library.cleanupPath(autonomousExtDir, true)
+
+                    erp_library.cleanupPath(
+                        "${env.WORKSPACE}\\1Cv8.cf",
+                        false
+                    )
+
+                    erp_library.cleanupPath(
+                        "${env.WORKSPACE}\\Mechel.cfe",
+                        false
+                    )
+                } else {
+                    echo '[INFO] DEBUG_BUILD_1C=true: автономные каталоги и локальные артефакты не удаляются'
+                }
+
+                erp_library.cleanupPath(extBaseDir, true)
+                erp_library.cleanupPath(cfBaseDir, true)
+                erp_library.cleanupPath('result.txt', false)
+            }
+        }
+    }
+}
