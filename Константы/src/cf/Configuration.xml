@@ -251,14 +251,13 @@
 		<ChildObjects>
 			<Language>Русский</Language>
 			<Subsystem>ПрикладныеНастройки</Subsystem>
-			<Role>ЧтениеПрикладныхНастроек</Role>
-			<Role>ДобавлениеИзменениеПрикладныхНастроек</Role>
-			<Role>ЗапускПрикладныхНастроек</Role>
-			<CommonModule>ПрикладныеНастройкиПоставка</CommonModule>
-			<CommonForm>ПросмотрПрикладныхНастроек</CommonForm>
-			<CommonForm>СостояниеПрограммныхНастроек</CommonForm>
-			<CommonForm>РедакторОтбораПрикладнойНастройки</CommonForm>
-			<Catalog>ГруппыПрикладныхНастроек</Catalog>
+			<Role>Мечел_ЧтениеПрикладныхНастроек</Role>
+			<Role>Мечел_ДобавлениеИзменениеПрикладныхНастроек</Role>
+			<CommonModule>Мечел_ПрикладныеНастройкиПоставка</CommonModule>
+			<CommonForm>Мечел_ПросмотрПрикладныхНастроек</CommonForm>
+			<CommonForm>Мечел_СостояниеПрограммныхНастроек</CommonForm>
+			<CommonForm>Мечел_РедакторОтбораПрикладнойНастройки</CommonForm>
+			<Catalog>Мечел_ГруппыПрикладныхНастроек</Catalog>
 		</ChildObjects>
 	</Configuration>
 </MetaDataObject>
