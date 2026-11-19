@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcssch="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
+	<AutoCommandBar name="КоманднаяПанель" id="-1">
+		<Autofill>false</Autofill>
+		<ChildItems>
+			<Button name="Обновить" id="1">
+				<Type>CommandBarButton</Type>
+				<CommandName>Form.Command.Обновить</CommandName>
+				<ExtendedTooltip name="ОбновитьРасширеннаяПодсказка" id="14"/>
+			</Button>
+		</ChildItems>
+	</AutoCommandBar>
+	<Events>
+		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
+	</Events>
+	<ChildItems>
+		<Table name="Настройки" id="2">
+			<ReadOnly>true</ReadOnly>
+			<ChangeRowSet>false</ChangeRowSet>
+			<DataPath>Настройки</DataPath>
+			<RowFilter xsi:nil="true"/>
+			<ContextMenu name="НастройкиКонтекстноеМеню" id="15"/>
+			<AutoCommandBar name="НастройкиКоманднаяПанель" id="16"/>
+			<ExtendedTooltip name="НастройкиРасширеннаяПодсказка" id="17"/>
+			<SearchStringAddition name="НастройкиСтрокаПоиска" id="18">
+				<AdditionSource>
+					<Item>Настройки</Item>
+					<Type>SearchStringRepresentation</Type>
+				</AdditionSource>
+				<ContextMenu name="НастройкиСтрокаПоискаКонтекстноеМеню" id="19"/>
+				<ExtendedTooltip name="НастройкиСтрокаПоискаРасширеннаяПодсказка" id="20"/>
+			</SearchStringAddition>
+			<ViewStatusAddition name="НастройкиСостояниеПросмотра" id="21">
+				<AdditionSource>
+					<Item>Настройки</Item>
+					<Type>ViewStatusRepresentation</Type>
+				</AdditionSource>
+				<ContextMenu name="НастройкиСостояниеПросмотраКонтекстноеМеню" id="22"/>
+				<ExtendedTooltip name="НастройкиСостояниеПросмотраРасширеннаяПодсказка" id="23"/>
+			</ViewStatusAddition>
+			<SearchControlAddition name="НастройкиУправлениеПоиском" id="24">
+				<AdditionSource>
+					<Item>Настройки</Item>
+					<Type>SearchControl</Type>
+				</AdditionSource>
+				<ContextMenu name="НастройкиУправлениеПоискомКонтекстноеМеню" id="25"/>
+				<ExtendedTooltip name="НастройкиУправлениеПоискомРасширеннаяПодсказка" id="26"/>
+			</SearchControlAddition>
+			<ChildItems>
+				<InputField name="ИдентификаторПоставки" id="10">
+					<DataPath>Настройки.ИдентификаторПоставки</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="ИдентификаторПоставкиКонтекстноеМеню" id="27"/>
+					<ExtendedTooltip name="ИдентификаторПоставкиРасширеннаяПодсказка" id="28"/>
+				</InputField>
+				<InputField name="ОжидаемыйКлюч" id="11">
+					<DataPath>Настройки.ОжидаемыйКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="ОжидаемыйКлючКонтекстноеМеню" id="29"/>
+					<ExtendedTooltip name="ОжидаемыйКлючРасширеннаяПодсказка" id="30"/>
+				</InputField>
+				<InputField name="ТекущийКлюч" id="12">
+					<DataPath>Настройки.ТекущийКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="ТекущийКлючКонтекстноеМеню" id="31"/>
+					<ExtendedTooltip name="ТекущийКлючРасширеннаяПодсказка" id="32"/>
+				</InputField>
+				<InputField name="Состояние" id="13">
+					<DataPath>Настройки.Состояние</DataPath>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="СостояниеКонтекстноеМеню" id="33"/>
+					<ExtendedTooltip name="СостояниеРасширеннаяПодсказка" id="34"/>
+				</InputField>
+			</ChildItems>
+		</Table>
+	</ChildItems>
+	<Attributes>
+		<Attribute name="Настройки" id="1">
+			<Type>
+				<v8:Type>v8:ValueTable</v8:Type>
+			</Type>
+			<Columns>
+				<Column name="ИдентификаторПоставки" id="1">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+				<Column name="ОжидаемыйКлюч" id="2">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+				<Column name="ТекущийКлюч" id="3">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+				<Column name="Состояние" id="4">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+			</Columns>
+		</Attribute>
+	</Attributes>
+	<Commands>
+		<Command name="Обновить" id="1">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Обновить</v8:content>
+				</v8:item>
+			</Title>
+			<Action>Обновить</Action>
+		</Command>
+	</Commands>
+</Form>
