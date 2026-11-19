@@ -17,7 +17,7 @@
 		<Table name="Настройки" id="2">
 			<ReadOnly>true</ReadOnly>
 			<ChangeRowSet>false</ChangeRowSet>
-			<DataPath>Настройки</DataPath>
+			<DataPath>СтрокиСостояния</DataPath>
 			<RowFilter xsi:nil="true"/>
 			<ContextMenu name="НастройкиКонтекстноеМеню" id="15"/>
 			<AutoCommandBar name="НастройкиКоманднаяПанель" id="16"/>
@@ -47,35 +47,53 @@
 				<ExtendedTooltip name="НастройкиУправлениеПоискомРасширеннаяПодсказка" id="26"/>
 			</SearchControlAddition>
 			<ChildItems>
-				<InputField name="ИдентификаторПоставки" id="10">
-					<DataPath>Настройки.ИдентификаторПоставки</DataPath>
-					<ReadOnly>true</ReadOnly>
-					<ContextMenu name="ИдентификаторПоставкиКонтекстноеМеню" id="27"/>
-					<ExtendedTooltip name="ИдентификаторПоставкиРасширеннаяПодсказка" id="28"/>
-				</InputField>
 				<InputField name="ОжидаемыйКлюч" id="11">
-					<DataPath>Настройки.ОжидаемыйКлюч</DataPath>
+					<DataPath>СтрокиСостояния.ОжидаемыйКлюч</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Ожидаемый ключ</v8:content>
+						</v8:item>
+					</Title>
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ОжидаемыйКлючКонтекстноеМеню" id="29"/>
 					<ExtendedTooltip name="ОжидаемыйКлючРасширеннаяПодсказка" id="30"/>
 				</InputField>
 				<InputField name="ТекущийКлюч" id="12">
-					<DataPath>Настройки.ТекущийКлюч</DataPath>
+					<DataPath>СтрокиСостояния.ТекущийКлюч</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Текущий ключ</v8:content>
+						</v8:item>
+					</Title>
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ТекущийКлючКонтекстноеМеню" id="31"/>
 					<ExtendedTooltip name="ТекущийКлючРасширеннаяПодсказка" id="32"/>
 				</InputField>
 				<InputField name="Состояние" id="13">
-					<DataPath>Настройки.Состояние</DataPath>
+					<DataPath>СтрокиСостояния.Состояние</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="СостояниеКонтекстноеМеню" id="33"/>
 					<ExtendedTooltip name="СостояниеРасширеннаяПодсказка" id="34"/>
+				</InputField>
+				<InputField name="ИдентификаторПоставки" id="10">
+					<DataPath>СтрокиСостояния.ИдентификаторПоставки</DataPath>
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Идентификатор поставки</v8:content>
+						</v8:item>
+					</Title>
+					<ReadOnly>true</ReadOnly>
+					<ContextMenu name="ИдентификаторПоставкиКонтекстноеМеню" id="27"/>
+					<ExtendedTooltip name="ИдентификаторПоставкиРасширеннаяПодсказка" id="28"/>
 				</InputField>
 			</ChildItems>
 		</Table>
 	</ChildItems>
 	<Attributes>
-		<Attribute name="Настройки" id="1">
+		<Attribute name="СтрокиСостояния" id="1">
 			<Type>
 				<v8:Type>v8:ValueTable</v8:Type>
 			</Type>

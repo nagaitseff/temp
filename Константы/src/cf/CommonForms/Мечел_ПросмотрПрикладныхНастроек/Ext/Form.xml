@@ -22,7 +22,7 @@
 			<ChangeRowSet>false</ChangeRowSet>
 			<Height>10</Height>
 			<UseAlternationRowColor>true</UseAlternationRowColor>
-			<DataPath>Настройки</DataPath>
+			<DataPath>СтрокиНастроек</DataPath>
 			<RowFilter xsi:nil="true"/>
 			<ContextMenu name="НастройкиКонтекстноеМеню" id="5"/>
 			<AutoCommandBar name="НастройкиКоманднаяПанель" id="6">
@@ -65,19 +65,19 @@
 			</Events>
 			<ChildItems>
 				<InputField name="КлючНастройки" id="8">
-					<DataPath>Настройки.КлючНастройки</DataPath>
+					<DataPath>СтрокиНастроек.КлючНастройки</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="КлючНастройкиКонтекстноеМеню" id="9"/>
 					<ExtendedTooltip name="КлючНастройкиРасширеннаяПодсказка" id="10"/>
 				</InputField>
 				<InputField name="ПредставлениеЗначения" id="11">
-					<DataPath>Настройки.ПредставлениеЗначения</DataPath>
+					<DataPath>СтрокиНастроек.ПредставлениеЗначения</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ПредставлениеЗначенияКонтекстноеМеню" id="12"/>
 					<ExtendedTooltip name="ПредставлениеЗначенияРасширеннаяПодсказка" id="13"/>
 				</InputField>
 				<InputField name="Описание" id="25">
-					<DataPath>Настройки.Описание</DataPath>
+					<DataPath>СтрокиНастроек.Описание</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -89,7 +89,7 @@
 					<ExtendedTooltip name="ОписаниеРасширеннаяПодсказка" id="41"/>
 				</InputField>
 				<InputField name="Автор" id="26">
-					<DataPath>Настройки.Автор</DataPath>
+					<DataPath>СтрокиНастроек.Автор</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -101,7 +101,7 @@
 					<ExtendedTooltip name="АвторРасширеннаяПодсказка" id="43"/>
 				</InputField>
 				<InputField name="НавигационнаяСсылка" id="27">
-					<DataPath>Настройки.НавигационнаяСсылка</DataPath>
+					<DataPath>СтрокиНастроек.НавигационнаяСсылка</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -113,7 +113,7 @@
 					<ExtendedTooltip name="НавигационнаяСсылкаРасширеннаяПодсказка" id="45"/>
 				</InputField>
 				<InputField name="ПредыдущийКлюч" id="28">
-					<DataPath>Настройки.ПредыдущийКлюч</DataPath>
+					<DataPath>СтрокиНастроек.ПредыдущийКлюч</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -125,7 +125,7 @@
 					<ExtendedTooltip name="ПредыдущийКлючРасширеннаяПодсказка" id="47"/>
 				</InputField>
 				<CheckBoxField name="ТребуетсяПроверкаВызовов" id="29">
-					<DataPath>Настройки.ТребуетсяПроверкаВызовов</DataPath>
+					<DataPath>СтрокиНастроек.ТребуетсяПроверкаВызовов</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -138,7 +138,7 @@
 					<ExtendedTooltip name="ТребуетсяПроверкаВызововРасширеннаяПодсказка" id="49"/>
 				</CheckBoxField>
 				<CheckBoxField name="ПометкаУдаления" id="30">
-					<DataPath>Настройки.ПометкаУдаления</DataPath>
+					<DataPath>СтрокиНастроек.ПометкаУдаления</DataPath>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -178,7 +178,7 @@
 				</v8:StringQualifiers>
 			</Type>
 		</Attribute>
-		<Attribute name="Настройки" id="2">
+		<Attribute name="СтрокиНастроек" id="2">
 			<Type>
 				<v8:Type>v8:ValueTable</v8:Type>
 			</Type>

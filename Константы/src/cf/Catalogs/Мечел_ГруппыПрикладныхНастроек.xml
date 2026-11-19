@@ -309,9 +309,9 @@
 			<DefaultListForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаСписка</DefaultListForm>
 			<DefaultChoiceForm/>
 			<DefaultFolderChoiceForm/>
-			<AuxiliaryObjectForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаЭлементаОбычная</AuxiliaryObjectForm>
+			<AuxiliaryObjectForm/>
 			<AuxiliaryFolderForm/>
-			<AuxiliaryListForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаСпискаОбычная</AuxiliaryListForm>
+			<AuxiliaryListForm/>
 			<AuxiliaryChoiceForm/>
 			<AuxiliaryFolderChoiceForm/>
 			<IncludeHelpInContents>false</IncludeHelpInContents>
@@ -960,9 +960,6 @@
 			<Form>ФормаСписка</Form>
 			<Form>ФормаЭлемента</Form>
 			<Form>ФормаВыбораЗначения</Form>
-			<Form>ФормаСпискаОбычная</Form>
-			<Form>ФормаЭлементаОбычная</Form>
-			<Form>ФормаВыбораЗначенияОбычная</Form>
 		</ChildObjects>
 	</Catalog>
 </MetaDataObject>

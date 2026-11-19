@@ -34,11 +34,12 @@
 		<Event name="BeforeWriteAtServer">ПередЗаписьюНаСервере</Event>
 	</Events>
 	<ChildItems>
-		<UsualGroup name="Группа1" id="50">
+		<UsualGroup name="ИмяНабораИПереименование" id="50">
+			<Group>Horizontal</Group>
 			<Behavior>Usual</Behavior>
 			<Representation>None</Representation>
 			<ShowTitle>false</ShowTitle>
-			<ExtendedTooltip name="Группа1РасширеннаяПодсказка" id="51"/>
+			<ExtendedTooltip name="ИмяНабораИПереименованиеРасширеннаяПодсказка" id="51"/>
 			<ChildItems>
 				<InputField name="Наименование" id="1">
 					<DataPath>Объект.Description</DataPath>
@@ -53,15 +54,15 @@
 					<ContextMenu name="НаименованиеКонтекстноеМеню" id="2"/>
 					<ExtendedTooltip name="НаименованиеРасширеннаяПодсказка" id="3"/>
 				</InputField>
-				<Button name="ПереименоватьГруппу" id="48">
+				<Button name="ПереименоватьНабор" id="48">
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
-					<CommandName>Form.Command.ПереименоватьГруппу</CommandName>
+					<CommandName>Form.Command.ПереименоватьНабор</CommandName>
 					<Picture>
 						<xr:Ref>StdPicture.Change</xr:Ref>
 						<xr:LoadTransparent>true</xr:LoadTransparent>
 					</Picture>
-					<ExtendedTooltip name="ПереименоватьГруппуРасширеннаяПодсказка" id="49"/>
+					<ExtendedTooltip name="ПереименоватьНаборРасширеннаяПодсказка" id="49"/>
 				</Button>
 			</ChildItems>
 		</UsualGroup>
@@ -98,25 +99,15 @@
 						</Picture>
 						<ExtendedTooltip name="ЗначенияКонстантДобавитьНастройкуРасширеннаяПодсказка" id="53"/>
 					</Button>
-					<Button name="ЗначенияКонстантИзменитьЗначение" id="59">
+					<Button name="ЗначенияКонстантИзменитьНастройку" id="59">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ИзменитьЗначение</CommandName>
+						<CommandName>Form.Command.ИзменитьНастройку</CommandName>
 						<Picture>
 							<xr:Ref>StdPicture.Change</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
-						<ExtendedTooltip name="ЗначенияКонстантИзменитьЗначениеРасширеннаяПодсказка" id="61"/>
-					</Button>
-					<Button name="ЗначенияКонстантУдалитьНастройку" id="54">
-						<Type>CommandBarButton</Type>
-						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.УдалитьНастройку</CommandName>
-						<Picture>
-							<xr:Ref>StdPicture.Delete</xr:Ref>
-							<xr:LoadTransparent>true</xr:LoadTransparent>
-						</Picture>
-						<ExtendedTooltip name="ЗначенияКонстантУдалитьНастройкуРасширеннаяПодсказка" id="55"/>
+						<ExtendedTooltip name="ЗначенияКонстантИзменитьНастройкуРасширеннаяПодсказка" id="61"/>
 					</Button>
 					<Button name="НастроитьОтбор" id="80">
 						<Type>CommandBarButton</Type>
@@ -127,6 +118,16 @@
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
 						<ExtendedTooltip name="НастроитьОтборРасширеннаяПодсказка" id="87"/>
+					</Button>
+					<Button name="ЗначенияКонстантИзменитьПометкуУдаленияНастройки" id="54">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ИзменитьПометкуУдаленияНастройки</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.Delete</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<ExtendedTooltip name="ЗначенияКонстантИзменитьПометкуУдаленияНастройкиРасширеннаяПодсказка" id="55"/>
 					</Button>
 					<Button name="ПодтвердитьПроверкуВызовов" id="67">
 						<Type>CommandBarButton</Type>
@@ -396,7 +397,7 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
-		<Command name="ПереименоватьГруппу" id="1">
+		<Command name="ПереименоватьНабор" id="1">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -409,7 +410,7 @@
 					<v8:content>Переименовать набор</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>ПереименоватьГруппу</Action>
+			<Action>ПереименоватьНабор</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
 		<Command name="ДобавитьНастройку" id="2">
@@ -428,7 +429,7 @@
 			<Action>ДобавитьНастройку</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="УдалитьНастройку" id="3">
+		<Command name="ИзменитьПометкуУдаленияНастройки" id="3">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
@@ -441,17 +442,17 @@
 					<v8:content>Пометить / снять пометку удаления</v8:content>
 				</v8:item>
 			</ToolTip>
-			<Action>УдалитьНастройку</Action>
+			<Action>ИзменитьПометкуУдаленияНастройки</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="ИзменитьЗначение" id="4">
+		<Command name="ИзменитьНастройку" id="4">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Изменить настройку</v8:content>
+					<v8:content>Изменить настройку…</v8:content>
 				</v8:item>
 			</Title>
-			<Action>ИзменитьЗначение</Action>
+			<Action>ИзменитьНастройку</Action>
 			<CurrentRowUse>Use</CurrentRowUse>
 		</Command>
 		<Command name="ЗаписатьНабор" id="5">

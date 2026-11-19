@@ -1,11 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcssch="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
+	<AutoTitle>false</AutoTitle>
 	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
+	<Width>88</Width>
+	<Height>19</Height>
 	<AutoCommandBar name="КоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
 			<Button name="Применить" id="50">
 				<Type>CommandBarButton</Type>
+				<DefaultButton>true</DefaultButton>
 				<Representation>PictureAndText</Representation>
 				<CommandName>Form.Command.Применить</CommandName>
 				<Picture>
@@ -17,7 +21,28 @@
 			<Button name="Отменить" id="51">
 				<Type>CommandBarButton</Type>
 				<CommandName>Form.StandardCommand.Close</CommandName>
+				<Title>
+					<v8:item>
+						<v8:lang>ru</v8:lang>
+						<v8:content>Отмена</v8:content>
+					</v8:item>
+				</Title>
 				<ExtendedTooltip name="ОтменитьРасширеннаяПодсказка" id="53"/>
+			</Button>
+			<Button name="ВыбратьПоляОтчета" id="54">
+				<Type>CommandBarButton</Type>
+				<CommandName>Form.Command.ВыбратьПоляОтчета</CommandName>
+				<ExtendedTooltip name="ВыбратьПоляОтчетаРасширеннаяПодсказка" id="55"/>
+			</Button>
+			<Button name="ВыбратьПоляОбъекта" id="79">
+				<Type>CommandBarButton</Type>
+				<CommandName>Form.Command.ВыбратьПоляОбъекта</CommandName>
+				<ExtendedTooltip name="ВыбратьПоляОбъектаРасширеннаяПодсказка" id="80"/>
+			</Button>
+			<Button name="ЗадатьПоляВручную" id="56">
+				<Type>CommandBarButton</Type>
+				<CommandName>Form.Command.ЗадатьПоляВручную</CommandName>
+				<ExtendedTooltip name="ЗадатьПоляВручнуюРасширеннаяПодсказка" id="57"/>
 			</Button>
 		</ChildItems>
 	</AutoCommandBar>
@@ -25,12 +50,135 @@
 		<Event name="OnCreateAtServer">ПриСозданииНаСервере</Event>
 	</Events>
 	<ChildItems>
+		<UsualGroup name="ГруппаПолей" id="58">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Доступные поля</v8:content>
+				</v8:item>
+			</Title>
+			<Group>Vertical</Group>
+			<Representation>NormalSeparation</Representation>
+			<ExtendedTooltip name="ГруппаПолейРасширеннаяПодсказка" id="59"/>
+			<ChildItems>
+				<LabelDecoration name="ПодсказкаПолей" id="81">
+					<Title>
+						<v8:item>
+							<v8:lang>ru</v8:lang>
+							<v8:content>Подберите поля из объекта или добавьте вручную. Тип поля определяет, что можно выбрать в условии.</v8:content>
+						</v8:item>
+					</Title>
+					<ContextMenu name="ПодсказкаПолейКонтекстноеМеню" id="82"/>
+					<ExtendedTooltip name="ПодсказкаПолейРасширеннаяПодсказка" id="83"/>
+				</LabelDecoration>
+				<Table name="ПоляОтбора" id="60">
+					<Representation>List</Representation>
+					<DataPath>ПоляОтбора</DataPath>
+					<Height>6</Height>
+					<HorizontalStretch>true</HorizontalStretch>
+					<SearchStringLocation>None</SearchStringLocation>
+					<ContextMenu name="ПоляОтбораКонтекстноеМеню" id="61"/>
+					<AutoCommandBar name="ПоляОтбораКоманднаяПанель" id="62"/>
+					<ExtendedTooltip name="ПоляОтбораРасширеннаяПодсказка" id="63"/>
+					<Events>
+						<Event name="OnStartEdit">ПоляОтбораПриНачалеРедактирования</Event>
+					</Events>
+					<ChildItems>
+						<InputField name="ПоляОтбораИмяПоля" id="64">
+							<DataPath>ПоляОтбора.ИмяПоля</DataPath>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Имя поля</v8:content>
+								</v8:item>
+							</Title>
+							<Width>25</Width>
+							<ContextMenu name="ПоляОтбораИмяПоляКонтекстноеМеню" id="65"/>
+							<ExtendedTooltip name="ПоляОтбораИмяПоляРасширеннаяПодсказка" id="66"/>
+							<Events>
+								<Event name="OnChange">ИмяПоляПриИзменении</Event>
+							</Events>
+						</InputField>
+						<InputField name="ПоляОтбораТипДанных" id="67">
+							<DataPath>ПоляОтбора.ТипДанных</DataPath>
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Тип значения</v8:content>
+								</v8:item>
+							</Title>
+							<ChoiceButton>true</ChoiceButton>
+							<TextEdit>false</TextEdit>
+							<Width>26</Width>
+							<ContextMenu name="ПоляОтбораТипДанныхКонтекстноеМеню" id="68"/>
+							<ExtendedTooltip name="ПоляОтбораТипДанныхРасширеннаяПодсказка" id="69"/>
+							<Events>
+								<Event name="StartChoice">ТипПоляНачалоВыбора</Event>
+							</Events>
+						</InputField>
+						<InputField name="ПоляОтбораЗаголовокПоля" id="70">
+							<DataPath>ПоляОтбора.ЗаголовокПоля</DataPath>
+							<Title>
+								<v8:item>
+									<v8:lang>ru</v8:lang>
+									<v8:content>Заголовок</v8:content>
+								</v8:item>
+							</Title>
+							<HorizontalStretch>true</HorizontalStretch>
+							<ContextMenu name="ПоляОтбораЗаголовокПоляКонтекстноеМеню" id="71"/>
+							<ExtendedTooltip name="ПоляОтбораЗаголовокПоляРасширеннаяПодсказка" id="72"/>
+						</InputField>
+						<LabelField name="ПоляОтбораИсходноеИмя" id="87">
+							<DataPath>ПоляОтбора.ИсходноеИмяПоля</DataPath>
+							<Visible>false</Visible>
+							<ContextMenu name="ПоляОтбораИсходноеИмяКонтекстноеМеню" id="88"/>
+							<ExtendedTooltip name="ПоляОтбораИсходноеИмяРасширеннаяПодсказка" id="89"/>
+						</LabelField>
+						<LabelField name="ПоляОтбораОписаниеТипов" id="90">
+							<DataPath>ПоляОтбора.ОписаниеТиповПоля</DataPath>
+							<Visible>false</Visible>
+							<ContextMenu name="ПоляОтбораОписаниеТиповКонтекстноеМеню" id="91"/>
+							<ExtendedTooltip name="ПоляОтбораОписаниеТиповРасширеннаяПодсказка" id="92"/>
+						</LabelField>
+					</ChildItems>
+				</Table>
+				<UsualGroup name="КомандыПолей" id="73">
+					<Group>Horizontal</Group>
+					<Representation>None</Representation>
+					<ShowTitle>false</ShowTitle>
+					<ExtendedTooltip name="КомандыПолейРасширеннаяПодсказка" id="74"/>
+					<ChildItems>
+						<Button name="ИспользоватьПоля" id="75">
+							<Type>UsualButton</Type>
+							<CommandName>Form.Command.ИспользоватьПоля</CommandName>
+							<ExtendedTooltip name="ИспользоватьПоляРасширеннаяПодсказка" id="76"/>
+						</Button>
+						<Button name="ВернутьсяКУсловиям" id="77">
+							<Type>UsualButton</Type>
+							<CommandName>Form.Command.ВернутьсяКУсловиям</CommandName>
+							<ExtendedTooltip name="ВернутьсяКУсловиямРасширеннаяПодсказка" id="78"/>
+						</Button>
+					</ChildItems>
+				</UsualGroup>
+			</ChildItems>
+		</UsualGroup>
+		<LabelDecoration name="ПодсказкаСхемыОтчета" id="84">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Поля заданы схемой. Они доступны в колонке «Поле» при добавлении условия.</v8:content>
+				</v8:item>
+			</Title>
+			<ContextMenu name="ПодсказкаСхемыОтчетаКонтекстноеМеню" id="85"/>
+			<ExtendedTooltip name="ПодсказкаСхемыОтчетаРасширеннаяПодсказка" id="86"/>
+		</LabelDecoration>
 		<Table name="НастройкиОтбор" id="31">
 			<Representation>List</Representation>
 			<Autofill>true</Autofill>
 			<DataPath>КомпоновщикНастроек.Settings.Filter</DataPath>
 			<ViewMode>All</ViewMode>
-			<SettingsNamedItemDetailedRepresentation>false</SettingsNamedItemDetailedRepresentation>
+			<SettingsNamedItemDetailedRepresentation>true</SettingsNamedItemDetailedRepresentation>
 			<ContextMenu name="НастройкиОтборКонтекстноеМеню" id="33"/>
 			<AutoCommandBar name="НастройкиОтборКоманднаяПанель" id="32"/>
 			<ExtendedTooltip name="НастройкиОтборРасширеннаяПодсказка" id="34"/>
@@ -88,6 +236,58 @@
 				<Field>АдресПараметров</Field>
 			</UseAlways>
 		</Attribute>
+		<Attribute name="АдресСхемыОтбора" id="3">
+			<Type>
+				<v8:Type>xs:string</v8:Type>
+			</Type>
+			<UseAlways>
+				<Field>АдресСхемыОтбора</Field>
+			</UseAlways>
+		</Attribute>
+		<Attribute name="ПоляОтбора" id="4">
+			<Type>
+				<v8:Type>v8:ValueTable</v8:Type>
+			</Type>
+			<Columns>
+				<Column name="ИмяПоля" id="1">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>150</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+				<Column name="ТипДанных" id="2">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+				<Column name="ЗаголовокПоля" id="3">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>150</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
+					</Type>
+				</Column>
+				<Column name="ИсходноеИмяПоля" id="21">
+					<Type>
+						<v8:Type>xs:string</v8:Type>
+					</Type>
+				</Column>
+				<Column name="ОписаниеТиповПоля" id="22">
+					<Type>
+						<v8:Type>v8:TypeDescription</v8:Type>
+					</Type>
+				</Column>
+			</Columns>
+			<UseAlways>
+				<Field>ПоляОтбора.ИсходноеИмяПоля</Field>
+				<Field>ПоляОтбора.ОписаниеТиповПоля</Field>
+			</UseAlways>
+		</Attribute>
 	</Attributes>
 	<Commands>
 		<Command name="Применить" id="1">
@@ -98,6 +298,57 @@
 				</v8:item>
 			</Title>
 			<Action>Применить</Action>
+		</Command>
+		<Command name="ВыбратьПоляОтчета" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Поля из отчета…</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ВыбратьПоляОтчета</Action>
+		</Command>
+		<Command name="ЗадатьПоляВручную" id="3">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Изменить поля…</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ЗадатьПоляВручную</Action>
+		</Command>
+		<Command name="ИспользоватьПоля" id="4">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Перейти к условиям</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ИспользоватьПоля</Action>
+		</Command>
+		<Command name="ВернутьсяКУсловиям" id="5">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>К условиям без изменений</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ВернутьсяКУсловиям</Action>
+		</Command>
+		<Command name="ВыбратьПоляОбъекта" id="6">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Поля объекта…</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Добавить реквизиты объекта конфигурации вместе с их типами</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Action>ВыбратьПоляОбъекта</Action>
 		</Command>
 	</Commands>
 	<Parameters>
