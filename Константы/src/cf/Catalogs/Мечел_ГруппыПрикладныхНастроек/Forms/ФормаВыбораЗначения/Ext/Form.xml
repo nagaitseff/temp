@@ -6,8 +6,8 @@
 			<v8:content>Настройка</v8:content>
 		</v8:item>
 	</Title>
-	<AutoTitle>false</AutoTitle>
 	<Width>73</Width>
+	<AutoTitle>false</AutoTitle>
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 	</AutoCommandBar>
@@ -52,10 +52,10 @@
 			</Events>
 		</RadioButtonField>
 		<UsualGroup name="НастройкаОтбора" id="82">
+			<Visible>false</Visible>
 			<Group>Horizontal</Group>
 			<Representation>None</Representation>
 			<ShowTitle>false</ShowTitle>
-			<Visible>false</Visible>
 			<ExtendedTooltip name="НастройкаОтбораРасширеннаяПодсказка" id="83"/>
 			<ChildItems>
 				<Button name="НастроитьУсловияОтбора" id="84">
@@ -156,16 +156,14 @@
 			<ChildItems>
 				<InputField name="НавигационнаяСсылкаПроект" id="64">
 					<DataPath>НавигационнаяСсылкаПроект</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
-					<MultiLine>false</MultiLine>
 					<HorizontalStretch>true</HorizontalStretch>
+					<MultiLine>false</MultiLine>
 					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<ContextMenu name="НавигационнаяСсылкаКонтекстноеМеню" id="65"/>
 					<ExtendedTooltip name="НавигационнаяСсылкаРасширеннаяПодсказка" id="66"/>
 				</InputField>
 				<InputField name="Автор" id="41">
 					<DataPath>Автор</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
@@ -179,7 +177,6 @@
 				</InputField>
 				<InputField name="Описание" id="40">
 					<DataPath>Описание</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
@@ -187,9 +184,9 @@
 						</v8:item>
 					</Title>
 					<AutoMaxWidth>false</AutoMaxWidth>
-					<MultiLine>true</MultiLine>
 					<Height>3</Height>
 					<HorizontalStretch>true</HorizontalStretch>
+					<MultiLine>true</MultiLine>
 					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<ContextMenu name="ОписаниеКонтекстноеМеню" id="46"/>
 					<ExtendedTooltip name="ОписаниеРасширеннаяПодсказка" id="47"/>
@@ -299,6 +296,10 @@
 			</Title>
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Attribute>
 		<Attribute name="ЗначенияСписка" id="5">
@@ -383,6 +384,10 @@
 		<Attribute name="АдресОтбораНастройки" id="11">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Attribute>
 		<Attribute name="ЭтоСохраненныйОтбор" id="12">
@@ -453,6 +458,10 @@
 		<Parameter name="АдресОтбора">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Parameter>
 	</Parameters>

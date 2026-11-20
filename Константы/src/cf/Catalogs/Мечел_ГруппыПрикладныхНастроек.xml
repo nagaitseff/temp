@@ -305,7 +305,7 @@
 			<FullTextSearchOnInputByString>DontUse</FullTextSearchOnInputByString>
 			<ChoiceDataGetModeOnInputByString>Directly</ChoiceDataGetModeOnInputByString>
 			<DefaultObjectForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаЭлемента</DefaultObjectForm>
-			<DefaultFolderForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаКаталога</DefaultFolderForm>
+			<DefaultFolderForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаГруппы</DefaultFolderForm>
 			<DefaultListForm>Catalog.Мечел_ГруппыПрикладныхНастроек.Form.ФормаСписка</DefaultListForm>
 			<DefaultChoiceForm/>
 			<DefaultFolderChoiceForm/>
@@ -956,10 +956,10 @@
 					</Attribute>
 				</ChildObjects>
 			</TabularSection>
-			<Form>ФормаКаталога</Form>
 			<Form>ФормаСписка</Form>
 			<Form>ФормаЭлемента</Form>
 			<Form>ФормаВыбораЗначения</Form>
+			<Form>ФормаГруппы</Form>
 		</ChildObjects>
 	</Catalog>
 </MetaDataObject>

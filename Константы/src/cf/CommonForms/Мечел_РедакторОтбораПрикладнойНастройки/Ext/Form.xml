@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcssch="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
-	<AutoTitle>false</AutoTitle>
-	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
 	<Width>88</Width>
 	<Height>19</Height>
+	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
+	<AutoTitle>false</AutoTitle>
 	<AutoCommandBar name="КоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
 			<Button name="Применить" id="50">
 				<Type>CommandBarButton</Type>
-				<DefaultButton>true</DefaultButton>
 				<Representation>PictureAndText</Representation>
+				<DefaultButton>true</DefaultButton>
 				<CommandName>Form.Command.Применить</CommandName>
 				<Picture>
 					<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
@@ -62,7 +62,7 @@
 			<ExtendedTooltip name="ГруппаПолейРасширеннаяПодсказка" id="59"/>
 			<ChildItems>
 				<LabelDecoration name="ПодсказкаПолей" id="81">
-					<Title>
+					<Title formatted="false">
 						<v8:item>
 							<v8:lang>ru</v8:lang>
 							<v8:content>Подберите поля из объекта или добавьте вручную. Тип поля определяет, что можно выбрать в условии.</v8:content>
@@ -73,20 +73,43 @@
 				</LabelDecoration>
 				<Table name="ПоляОтбора" id="60">
 					<Representation>List</Representation>
-					<DataPath>ПоляОтбора</DataPath>
 					<Height>6</Height>
-					<HorizontalStretch>true</HorizontalStretch>
+					<DataPath>ПоляОтбора</DataPath>
 					<SearchStringLocation>None</SearchStringLocation>
+					<RowFilter xsi:nil="true"/>
 					<ContextMenu name="ПоляОтбораКонтекстноеМеню" id="61"/>
 					<AutoCommandBar name="ПоляОтбораКоманднаяПанель" id="62"/>
 					<ExtendedTooltip name="ПоляОтбораРасширеннаяПодсказка" id="63"/>
+					<SearchStringAddition name="ПоляОтбораСтрокаПоиска" id="93">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>SearchStringRepresentation</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораСтрокаПоискаКонтекстноеМеню" id="94"/>
+						<ExtendedTooltip name="ПоляОтбораСтрокаПоискаРасширеннаяПодсказка" id="95"/>
+					</SearchStringAddition>
+					<ViewStatusAddition name="ПоляОтбораСостояниеПросмотра" id="96">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>ViewStatusRepresentation</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораСостояниеПросмотраКонтекстноеМеню" id="97"/>
+						<ExtendedTooltip name="ПоляОтбораСостояниеПросмотраРасширеннаяПодсказка" id="98"/>
+					</ViewStatusAddition>
+					<SearchControlAddition name="ПоляОтбораУправлениеПоиском" id="99">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>SearchControl</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораУправлениеПоискомКонтекстноеМеню" id="100"/>
+						<ExtendedTooltip name="ПоляОтбораУправлениеПоискомРасширеннаяПодсказка" id="101"/>
+					</SearchControlAddition>
 					<Events>
 						<Event name="OnStartEdit">ПоляОтбораПриНачалеРедактирования</Event>
 					</Events>
 					<ChildItems>
 						<InputField name="ПоляОтбораИмяПоля" id="64">
 							<DataPath>ПоляОтбора.ИмяПоля</DataPath>
-							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<Title>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
@@ -94,6 +117,7 @@
 								</v8:item>
 							</Title>
 							<Width>25</Width>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<ContextMenu name="ПоляОтбораИмяПоляКонтекстноеМеню" id="65"/>
 							<ExtendedTooltip name="ПоляОтбораИмяПоляРасширеннаяПодсказка" id="66"/>
 							<Events>
@@ -108,9 +132,9 @@
 									<v8:content>Тип значения</v8:content>
 								</v8:item>
 							</Title>
+							<Width>26</Width>
 							<ChoiceButton>true</ChoiceButton>
 							<TextEdit>false</TextEdit>
-							<Width>26</Width>
 							<ContextMenu name="ПоляОтбораТипДанныхКонтекстноеМеню" id="68"/>
 							<ExtendedTooltip name="ПоляОтбораТипДанныхРасширеннаяПодсказка" id="69"/>
 							<Events>
@@ -164,7 +188,7 @@
 			</ChildItems>
 		</UsualGroup>
 		<LabelDecoration name="ПодсказкаСхемыОтчета" id="84">
-			<Title>
+			<Title formatted="false">
 				<v8:item>
 					<v8:lang>ru</v8:lang>
 					<v8:content>Поля заданы схемой. Они доступны в колонке «Поле» при добавлении условия.</v8:content>
@@ -239,6 +263,10 @@
 		<Attribute name="АдресСхемыОтбора" id="3">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 			<UseAlways>
 				<Field>АдресСхемыОтбора</Field>
@@ -248,6 +276,10 @@
 			<Type>
 				<v8:Type>v8:ValueTable</v8:Type>
 			</Type>
+			<UseAlways>
+				<Field>ПоляОтбора.ИсходноеИмяПоля</Field>
+				<Field>ПоляОтбора.ОписаниеТиповПоля</Field>
+			</UseAlways>
 			<Columns>
 				<Column name="ИмяПоля" id="1">
 					<Type>
@@ -261,6 +293,10 @@
 				<Column name="ТипДанных" id="2">
 					<Type>
 						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
 					</Type>
 				</Column>
 				<Column name="ЗаголовокПоля" id="3">
@@ -275,6 +311,10 @@
 				<Column name="ИсходноеИмяПоля" id="21">
 					<Type>
 						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
 					</Type>
 				</Column>
 				<Column name="ОписаниеТиповПоля" id="22">
@@ -283,10 +323,6 @@
 					</Type>
 				</Column>
 			</Columns>
-			<UseAlways>
-				<Field>ПоляОтбора.ИсходноеИмяПоля</Field>
-				<Field>ПоляОтбора.ОписаниеТиповПоля</Field>
-			</UseAlways>
 		</Attribute>
 	</Attributes>
 	<Commands>

@@ -49,25 +49,25 @@
 			<ChildItems>
 				<InputField name="ОжидаемыйКлюч" id="11">
 					<DataPath>СтрокиСостояния.ОжидаемыйКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
 							<v8:content>Ожидаемый ключ</v8:content>
 						</v8:item>
 					</Title>
-					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ОжидаемыйКлючКонтекстноеМеню" id="29"/>
 					<ExtendedTooltip name="ОжидаемыйКлючРасширеннаяПодсказка" id="30"/>
 				</InputField>
 				<InputField name="ТекущийКлюч" id="12">
 					<DataPath>СтрокиСостояния.ТекущийКлюч</DataPath>
+					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
 							<v8:content>Текущий ключ</v8:content>
 						</v8:item>
 					</Title>
-					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ТекущийКлючКонтекстноеМеню" id="31"/>
 					<ExtendedTooltip name="ТекущийКлючРасширеннаяПодсказка" id="32"/>
 				</InputField>
@@ -79,13 +79,13 @@
 				</InputField>
 				<InputField name="ИдентификаторПоставки" id="10">
 					<DataPath>СтрокиСостояния.ИдентификаторПоставки</DataPath>
+					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
 							<v8:content>Идентификатор поставки</v8:content>
 						</v8:item>
 					</Title>
-					<ReadOnly>true</ReadOnly>
 					<ContextMenu name="ИдентификаторПоставкиКонтекстноеМеню" id="27"/>
 					<ExtendedTooltip name="ИдентификаторПоставкиРасширеннаяПодсказка" id="28"/>
 				</InputField>
