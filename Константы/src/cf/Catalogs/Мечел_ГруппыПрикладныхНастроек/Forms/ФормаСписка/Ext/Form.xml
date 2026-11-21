@@ -3,10 +3,10 @@
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
-			<Button name="СоздатьКаталог" id="25">
+			<Button name="СоздатьГруппу" id="25">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.СоздатьКаталог</CommandName>
+				<CommandName>Form.Item.Список.StandardCommand.CreateFolder</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<Picture>
 					<xr:Ref>StdPicture.CreateFolder</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -17,17 +17,28 @@
 						<v8:content>Создать каталог</v8:content>
 					</v8:item>
 				</Title>
-				<ExtendedTooltip name="СоздатьКаталогРасширеннаяПодсказка" id="28"/>
+				<ExtendedTooltip name="СоздатьГруппуРасширеннаяПодсказка" id="28"/>
 			</Button>
-			<Button name="ФормаСоздатьГруппу" id="21">
+			<Button name="ФормаСоздатьНабор" id="21">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.СоздатьГруппу</CommandName>
+				<CommandName>Form.Item.Список.StandardCommand.Create</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<BackColor>#FFE69B</BackColor>
+				<TextColor>#352B13</TextColor>
 				<Picture>
 					<xr:Ref>StdPicture.CreateListItem</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
-				<ExtendedTooltip name="ФормаСоздатьГруппуРасширеннаяПодсказка" id="22"/>
+				<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Создать набор</v8:content></v8:item></Title>
+				<ExtendedTooltip name="ФормаСоздатьНаборРасширеннаяПодсказка" id="22"/>
+			</Button>
+			<Button name="ПометитьОбъект" id="40">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.Item.Список.StandardCommand.SetDeletionMark</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Изменить пометку удаления</v8:content></v8:item></Title>
+				<Picture><xr:Ref>StdPicture.MarkToDelete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<ExtendedTooltip name="ПометитьОбъектПодсказка" id="41"/>
 			</Button>
 			<Button name="ЗаполнитьПримеры" id="26">
 				<Type>CommandBarButton</Type>
@@ -43,7 +54,7 @@
 			<Button name="ПроверитьПоставку" id="27">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ПроверитьПоставку</CommandName>
+				<CommandName>Form.Command.ПроверитьПоставку</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<Picture>
 					<xr:Ref>StdPicture.ListSettings</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -58,12 +69,14 @@
 					<xr:Ref>StdPicture.Refresh</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
-				<LocationInCommandBar>InCommandBarAndInAdditionalSubmenu</LocationInCommandBar>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ФормаОбновитьРасширеннаяПодсказка" id="24"/>
 			</Button>
 			<Button name="ФормаВыполнитьТесты" id="19">
 				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
 				<CommandName>Form.Command.ВыполнитьТесты</CommandName>
+				<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 				<LocationInCommandBar>InAdditionalSubmenu</LocationInCommandBar>
 				<ExtendedTooltip name="ФормаВыполнитьТестыРасширеннаяПодсказка" id="20"/>
 			</Button>
@@ -84,13 +97,13 @@
 			<ExtendedTooltip name="СписокКомпоновщикНастроекПользовательскиеНастройкиРасширеннаяПодсказка" id="2"/>
 		</UsualGroup>
 		<Table name="Список" id="3">
-			<Representation>Tree</Representation>
 			<CommandBarLocation>None</CommandBarLocation>
 			<DefaultItem>true</DefaultItem>
-			<ChangeRowSet>false</ChangeRowSet>
+			<Representation>Tree</Representation>
 			<UseAlternationRowColor>true</UseAlternationRowColor>
 			<InitialTreeView>ExpandTopLevel</InitialTreeView>
 			<EnableStartDrag>true</EnableStartDrag>
+			<EnableDrag>true</EnableDrag>
 			<FileDragMode>AsFile</FileDragMode>
 			<DataPath>Список</DataPath>
 			<RowPictureDataPath>Список.DefaultPicture</RowPictureDataPath>
@@ -104,15 +117,13 @@
 			<ChoiceFoldersAndItems>Items</ChoiceFoldersAndItems>
 			<RestoreCurrentRow>false</RestoreCurrentRow>
 			<TopLevelParent xsi:nil="true"/>
-			<ShowRoot>true</ShowRoot>
+			<ShowRoot>false</ShowRoot>
 			<AllowRootChoice>false</AllowRootChoice>
 			<UpdateOnDataChange>Auto</UpdateOnDataChange>
 			<UserSettingsGroup>СписокКомпоновщикНастроекПользовательскиеНастройки</UserSettingsGroup>
 			<AllowGettingCurrentRowURL>true</AllowGettingCurrentRowURL>
 			<ContextMenu name="СписокКонтекстноеМеню" id="4"/>
-			<AutoCommandBar name="СписокКоманднаяПанель" id="5">
-				<Autofill>false</Autofill>
-			</AutoCommandBar>
+			<AutoCommandBar name="СписокКоманднаяПанель" id="5"/>
 			<ExtendedTooltip name="СписокРасширеннаяПодсказка" id="6"/>
 			<SearchStringAddition name="СписокСтрокаПоиска" id="7">
 				<AdditionSource>
@@ -144,6 +155,12 @@
 					<DefaultItem>true</DefaultItem>
 					<ContextMenu name="НаименованиеКонтекстноеМеню" id="17"/>
 					<ExtendedTooltip name="НаименованиеРасширеннаяПодсказка" id="18"/>
+				</LabelField>
+				<LabelField name="Ссылка" id="31">
+					<DataPath>Список.Ref</DataPath>
+					<Visible>false</Visible>
+					<ContextMenu name="СсылкаКонтекстноеМеню" id="32"/>
+					<ExtendedTooltip name="СсылкаРасширеннаяПодсказка" id="33"/>
 				</LabelField>
 			</ChildItems>
 		</Table>
@@ -194,22 +211,6 @@
 			<Action>ВыполнитьТесты</Action>
 			<CurrentRowUse>DontUse</CurrentRowUse>
 		</Command>
-		<Command name="СоздатьГруппу" id="2">
-			<Title>
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Создать набор</v8:content>
-				</v8:item>
-			</Title>
-			<ToolTip>
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Создать набор</v8:content>
-				</v8:item>
-			</ToolTip>
-			<Action>СоздатьГруппу</Action>
-			<CurrentRowUse>DontUse</CurrentRowUse>
-		</Command>
 		<Command name="ЗаполнитьПримеры" id="3">
 			<Title>
 				<v8:item>
@@ -223,19 +224,10 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Проверить программные настройки</v8:content>
+					<v8:content>Состояние поставки</v8:content>
 				</v8:item>
 			</Title>
 			<Action>ПроверитьПоставку</Action>
-		</Command>
-		<Command name="СоздатьКаталог" id="5">
-			<Title>
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Создать каталог</v8:content>
-				</v8:item>
-			</Title>
-			<Action>СоздатьКаталогНастроек</Action>
 		</Command>
 	</Commands>
 </Form>

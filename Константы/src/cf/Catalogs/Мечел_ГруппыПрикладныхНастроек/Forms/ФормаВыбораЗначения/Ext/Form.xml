@@ -6,8 +6,8 @@
 			<v8:content>Настройка</v8:content>
 		</v8:item>
 	</Title>
-	<AutoTitle>false</AutoTitle>
 	<Width>73</Width>
+	<AutoTitle>false</AutoTitle>
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 	</AutoCommandBar>
@@ -52,15 +52,17 @@
 			</Events>
 		</RadioButtonField>
 		<UsualGroup name="НастройкаОтбора" id="82">
+			<Visible>false</Visible>
 			<Group>Horizontal</Group>
 			<Representation>None</Representation>
 			<ShowTitle>false</ShowTitle>
-			<Visible>false</Visible>
 			<ExtendedTooltip name="НастройкаОтбораРасширеннаяПодсказка" id="83"/>
 			<ChildItems>
 				<Button name="НастроитьУсловияОтбора" id="84">
-					<Type>Hyperlink</Type>
+					<Type>UsualButton</Type>
+					<Representation>PictureAndText</Representation>
 					<CommandName>Form.Command.НастроитьУсловияОтбора</CommandName>
+					<Picture><xr:Ref>StdPicture.DataCompositionFilter</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 					<ExtendedTooltip name="НастроитьУсловияОтбораРасширеннаяПодсказка" id="85"/>
 				</Button>
 				<LabelDecoration name="ПодсказкаОтбора" id="86">
@@ -86,25 +88,29 @@
 					<Button name="СписокДобавить" id="28">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Add</CommandName>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Add</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 						<ExtendedTooltip name="СписокДобавитьРасширеннаяПодсказка" id="29"/>
 					</Button>
 					<Button name="СписокУдалить" id="30">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Delete</CommandName>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 						<ExtendedTooltip name="СписокУдалитьРасширеннаяПодсказка" id="31"/>
 					</Button>
 					<Button name="СписокПереместитьВверх" id="32">
 						<Type>CommandBarButton</Type>
 						<Representation>Picture</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveUp</CommandName>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 						<ExtendedTooltip name="СписокПереместитьВверхРасширеннаяПодсказка" id="33"/>
 					</Button>
 					<Button name="СписокПереместитьВниз" id="34">
 						<Type>CommandBarButton</Type>
 						<Representation>Picture</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveDown</CommandName>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 						<ExtendedTooltip name="СписокПереместитьВнизРасширеннаяПодсказка" id="35"/>
 					</Button>
 				</ChildItems>
@@ -156,16 +162,14 @@
 			<ChildItems>
 				<InputField name="НавигационнаяСсылкаПроект" id="64">
 					<DataPath>НавигационнаяСсылкаПроект</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
-					<MultiLine>false</MultiLine>
 					<HorizontalStretch>true</HorizontalStretch>
+					<MultiLine>false</MultiLine>
 					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<ContextMenu name="НавигационнаяСсылкаКонтекстноеМеню" id="65"/>
 					<ExtendedTooltip name="НавигационнаяСсылкаРасширеннаяПодсказка" id="66"/>
 				</InputField>
 				<InputField name="Автор" id="41">
 					<DataPath>Автор</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
@@ -179,7 +183,6 @@
 				</InputField>
 				<InputField name="Описание" id="40">
 					<DataPath>Описание</DataPath>
-					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
@@ -187,9 +190,9 @@
 						</v8:item>
 					</Title>
 					<AutoMaxWidth>false</AutoMaxWidth>
-					<MultiLine>true</MultiLine>
 					<Height>3</Height>
 					<HorizontalStretch>true</HorizontalStretch>
+					<MultiLine>true</MultiLine>
 					<AutoMarkIncomplete>true</AutoMarkIncomplete>
 					<ContextMenu name="ОписаниеКонтекстноеМеню" id="46"/>
 					<ExtendedTooltip name="ОписаниеРасширеннаяПодсказка" id="47"/>
@@ -208,10 +211,9 @@
 					<Representation>PictureAndText</Representation>
 					<DefaultButton>true</DefaultButton>
 					<CommandName>Form.Command.СохранитьЗначениеНастройки</CommandName>
-					<Picture>
-						<xr:Ref>StdPicture.WriteAndClose</xr:Ref>
-						<xr:LoadTransparent>true</xr:LoadTransparent>
-					</Picture>
+					<BackColor>#FFE69B</BackColor>
+					<TextColor>#352B13</TextColor>
+					<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 					<ExtendedTooltip name="СохранитьЗначениеНастройкиРасширеннаяПодсказка" id="11"/>
 				</Button>
 				<Button name="ОтменитьРедактирование" id="12">
@@ -226,7 +228,9 @@
 				</Button>
 				<Button name="ОчиститьЗначение" id="16">
 					<Type>UsualButton</Type>
+					<Representation>PictureAndText</Representation>
 					<CommandName>Form.Command.ОчиститьЗначение</CommandName>
+					<Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 					<ExtendedTooltip name="ОчиститьЗначениеРасширеннаяПодсказка" id="17"/>
 				</Button>
 			</ChildItems>
@@ -299,6 +303,10 @@
 			</Title>
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Attribute>
 		<Attribute name="ЗначенияСписка" id="5">
@@ -383,6 +391,10 @@
 		<Attribute name="АдресОтбораНастройки" id="11">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Attribute>
 		<Attribute name="ЭтоСохраненныйОтбор" id="12">
@@ -453,6 +465,10 @@
 		<Parameter name="АдресОтбора">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 		</Parameter>
 	</Parameters>

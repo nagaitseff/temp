@@ -1,17 +1,19 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Form xmlns="http://v8.1c.ru/8.3/xcf/logform" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcssch="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
-	<AutoTitle>false</AutoTitle>
-	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
 	<Width>88</Width>
 	<Height>19</Height>
+	<WindowOpeningMode>LockOwnerWindow</WindowOpeningMode>
+	<AutoTitle>false</AutoTitle>
 	<AutoCommandBar name="КоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
 			<Button name="Применить" id="50">
 				<Type>CommandBarButton</Type>
-				<DefaultButton>true</DefaultButton>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.Применить</CommandName>
+				<DefaultButton>true</DefaultButton>
+				<CommandName>Form.Command.Применить</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<BackColor>#FFE69B</BackColor>
+				<TextColor>#352B13</TextColor>
 				<Picture>
 					<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -20,7 +22,9 @@
 			</Button>
 			<Button name="Отменить" id="51">
 				<Type>CommandBarButton</Type>
-				<CommandName>Form.StandardCommand.Close</CommandName>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.StandardCommand.Close</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Picture><xr:Ref>StdPicture.Stop</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 				<Title>
 					<v8:item>
 						<v8:lang>ru</v8:lang>
@@ -31,17 +35,23 @@
 			</Button>
 			<Button name="ВыбратьПоляОтчета" id="54">
 				<Type>CommandBarButton</Type>
-				<CommandName>Form.Command.ВыбратьПоляОтчета</CommandName>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.Command.ВыбратьПоляОтчета</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Picture><xr:Ref>StdPicture.Report</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 				<ExtendedTooltip name="ВыбратьПоляОтчетаРасширеннаяПодсказка" id="55"/>
 			</Button>
 			<Button name="ВыбратьПоляОбъекта" id="79">
 				<Type>CommandBarButton</Type>
-				<CommandName>Form.Command.ВыбратьПоляОбъекта</CommandName>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.Command.ВыбратьПоляОбъекта</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 				<ExtendedTooltip name="ВыбратьПоляОбъектаРасширеннаяПодсказка" id="80"/>
 			</Button>
 			<Button name="ЗадатьПоляВручную" id="56">
 				<Type>CommandBarButton</Type>
-				<CommandName>Form.Command.ЗадатьПоляВручную</CommandName>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.Command.ЗадатьПоляВручную</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Picture><xr:Ref>StdPicture.ListSettings</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 				<ExtendedTooltip name="ЗадатьПоляВручнуюРасширеннаяПодсказка" id="57"/>
 			</Button>
 		</ChildItems>
@@ -62,7 +72,7 @@
 			<ExtendedTooltip name="ГруппаПолейРасширеннаяПодсказка" id="59"/>
 			<ChildItems>
 				<LabelDecoration name="ПодсказкаПолей" id="81">
-					<Title>
+					<Title formatted="false">
 						<v8:item>
 							<v8:lang>ru</v8:lang>
 							<v8:content>Подберите поля из объекта или добавьте вручную. Тип поля определяет, что можно выбрать в условии.</v8:content>
@@ -73,20 +83,51 @@
 				</LabelDecoration>
 				<Table name="ПоляОтбора" id="60">
 					<Representation>List</Representation>
-					<DataPath>ПоляОтбора</DataPath>
 					<Height>6</Height>
-					<HorizontalStretch>true</HorizontalStretch>
+					<DataPath>ПоляОтбора</DataPath>
 					<SearchStringLocation>None</SearchStringLocation>
+					<RowFilter xsi:nil="true"/>
 					<ContextMenu name="ПоляОтбораКонтекстноеМеню" id="61"/>
-					<AutoCommandBar name="ПоляОтбораКоманднаяПанель" id="62"/>
+					<AutoCommandBar name="ПоляОтбораКоманднаяПанель" id="62">
+				<Autofill>false</Autofill>
+				<ChildItems>
+					<Button name="ПоляОтбораAdd" id="820"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.Add</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Добавить поле</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораAddПодсказка" id="821"/></Button>
+					<Button name="ПоляОтбораDelete" id="822"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Удалить</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораDeleteПодсказка" id="823"/></Button>
+					<Button name="ПоляОтбораMoveUp" id="824"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Выше</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораMoveUpПодсказка" id="825"/></Button>
+					<Button name="ПоляОтбораMoveDown" id="826"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Ниже</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораMoveDownПодсказка" id="827"/></Button>
+				</ChildItems>
+			</AutoCommandBar>
 					<ExtendedTooltip name="ПоляОтбораРасширеннаяПодсказка" id="63"/>
+					<SearchStringAddition name="ПоляОтбораСтрокаПоиска" id="93">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>SearchStringRepresentation</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораСтрокаПоискаКонтекстноеМеню" id="94"/>
+						<ExtendedTooltip name="ПоляОтбораСтрокаПоискаРасширеннаяПодсказка" id="95"/>
+					</SearchStringAddition>
+					<ViewStatusAddition name="ПоляОтбораСостояниеПросмотра" id="96">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>ViewStatusRepresentation</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораСостояниеПросмотраКонтекстноеМеню" id="97"/>
+						<ExtendedTooltip name="ПоляОтбораСостояниеПросмотраРасширеннаяПодсказка" id="98"/>
+					</ViewStatusAddition>
+					<SearchControlAddition name="ПоляОтбораУправлениеПоиском" id="99">
+						<AdditionSource>
+							<Item>ПоляОтбора</Item>
+							<Type>SearchControl</Type>
+						</AdditionSource>
+						<ContextMenu name="ПоляОтбораУправлениеПоискомКонтекстноеМеню" id="100"/>
+						<ExtendedTooltip name="ПоляОтбораУправлениеПоискомРасширеннаяПодсказка" id="101"/>
+					</SearchControlAddition>
 					<Events>
 						<Event name="OnStartEdit">ПоляОтбораПриНачалеРедактирования</Event>
 					</Events>
 					<ChildItems>
 						<InputField name="ПоляОтбораИмяПоля" id="64">
 							<DataPath>ПоляОтбора.ИмяПоля</DataPath>
-							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<Title>
 								<v8:item>
 									<v8:lang>ru</v8:lang>
@@ -94,6 +135,7 @@
 								</v8:item>
 							</Title>
 							<Width>25</Width>
+							<AutoMarkIncomplete>true</AutoMarkIncomplete>
 							<ContextMenu name="ПоляОтбораИмяПоляКонтекстноеМеню" id="65"/>
 							<ExtendedTooltip name="ПоляОтбораИмяПоляРасширеннаяПодсказка" id="66"/>
 							<Events>
@@ -108,9 +150,9 @@
 									<v8:content>Тип значения</v8:content>
 								</v8:item>
 							</Title>
+							<Width>26</Width>
 							<ChoiceButton>true</ChoiceButton>
 							<TextEdit>false</TextEdit>
-							<Width>26</Width>
 							<ContextMenu name="ПоляОтбораТипДанныхКонтекстноеМеню" id="68"/>
 							<ExtendedTooltip name="ПоляОтбораТипДанныхРасширеннаяПодсказка" id="69"/>
 							<Events>
@@ -151,12 +193,18 @@
 					<ChildItems>
 						<Button name="ИспользоватьПоля" id="75">
 							<Type>UsualButton</Type>
+							<Representation>PictureAndText</Representation>
 							<CommandName>Form.Command.ИспользоватьПоля</CommandName>
+							<BackColor>#FFE69B</BackColor>
+							<TextColor>#352B13</TextColor>
+							<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 							<ExtendedTooltip name="ИспользоватьПоляРасширеннаяПодсказка" id="76"/>
 						</Button>
 						<Button name="ВернутьсяКУсловиям" id="77">
 							<Type>UsualButton</Type>
+							<Representation>PictureAndText</Representation>
 							<CommandName>Form.Command.ВернутьсяКУсловиям</CommandName>
+							<Picture><xr:Ref>StdPicture.Stop</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 							<ExtendedTooltip name="ВернутьсяКУсловиямРасширеннаяПодсказка" id="78"/>
 						</Button>
 					</ChildItems>
@@ -164,7 +212,7 @@
 			</ChildItems>
 		</UsualGroup>
 		<LabelDecoration name="ПодсказкаСхемыОтчета" id="84">
-			<Title>
+			<Title formatted="false">
 				<v8:item>
 					<v8:lang>ru</v8:lang>
 					<v8:content>Поля заданы схемой. Они доступны в колонке «Поле» при добавлении условия.</v8:content>
@@ -180,7 +228,17 @@
 			<ViewMode>All</ViewMode>
 			<SettingsNamedItemDetailedRepresentation>true</SettingsNamedItemDetailedRepresentation>
 			<ContextMenu name="НастройкиОтборКонтекстноеМеню" id="33"/>
-			<AutoCommandBar name="НастройкиОтборКоманднаяПанель" id="32"/>
+			<AutoCommandBar name="НастройкиОтборКоманднаяПанель" id="32">
+				<Autofill>false</Autofill>
+				<ChildItems>
+					<Button name="НастройкиОтборAddFilterItem" id="520"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.AddFilterItem</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Добавить условие</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборAddFilterItemПодсказка" id="521"/></Button>
+					<Button name="НастройкиОтборGroupFilterItems" id="522"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.GroupFilterItems</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Сгруппировать…</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.DataCompositionGroupFields</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборGroupFilterItemsПодсказка" id="523"/></Button>
+					<Button name="НастройкиОтборUngroup" id="524"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.Ungroup</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Разгруппировать</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборUngroupПодсказка" id="525"/></Button>
+					<Button name="НастройкиОтборDelete" id="526"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Удалить</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборDeleteПодсказка" id="527"/></Button>
+					<Button name="НастройкиОтборMoveUp" id="528"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Выше</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборMoveUpПодсказка" id="529"/></Button>
+					<Button name="НастройкиОтборMoveDown" id="530"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Ниже</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборMoveDownПодсказка" id="531"/></Button>
+				</ChildItems>
+			</AutoCommandBar>
 			<ExtendedTooltip name="НастройкиОтборРасширеннаяПодсказка" id="34"/>
 			<SearchStringAddition name="НастройкиОтборСтрокаПоиска" id="35">
 				<AdditionSource>
@@ -239,6 +297,10 @@
 		<Attribute name="АдресСхемыОтбора" id="3">
 			<Type>
 				<v8:Type>xs:string</v8:Type>
+				<v8:StringQualifiers>
+					<v8:Length>0</v8:Length>
+					<v8:AllowedLength>Variable</v8:AllowedLength>
+				</v8:StringQualifiers>
 			</Type>
 			<UseAlways>
 				<Field>АдресСхемыОтбора</Field>
@@ -248,6 +310,10 @@
 			<Type>
 				<v8:Type>v8:ValueTable</v8:Type>
 			</Type>
+			<UseAlways>
+				<Field>ПоляОтбора.ИсходноеИмяПоля</Field>
+				<Field>ПоляОтбора.ОписаниеТиповПоля</Field>
+			</UseAlways>
 			<Columns>
 				<Column name="ИмяПоля" id="1">
 					<Type>
@@ -261,6 +327,10 @@
 				<Column name="ТипДанных" id="2">
 					<Type>
 						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
 					</Type>
 				</Column>
 				<Column name="ЗаголовокПоля" id="3">
@@ -275,6 +345,10 @@
 				<Column name="ИсходноеИмяПоля" id="21">
 					<Type>
 						<v8:Type>xs:string</v8:Type>
+						<v8:StringQualifiers>
+							<v8:Length>0</v8:Length>
+							<v8:AllowedLength>Variable</v8:AllowedLength>
+						</v8:StringQualifiers>
 					</Type>
 				</Column>
 				<Column name="ОписаниеТиповПоля" id="22">
@@ -283,10 +357,6 @@
 					</Type>
 				</Column>
 			</Columns>
-			<UseAlways>
-				<Field>ПоляОтбора.ИсходноеИмяПоля</Field>
-				<Field>ПоляОтбора.ОписаниеТиповПоля</Field>
-			</UseAlways>
 		</Attribute>
 	</Attributes>
 	<Commands>
@@ -330,7 +400,7 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>К условиям без изменений</v8:content>
+					<v8:content>Отменить изменения полей</v8:content>
 				</v8:item>
 			</Title>
 			<Action>ВернутьсяКУсловиям</Action>

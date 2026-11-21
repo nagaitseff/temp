@@ -4,26 +4,28 @@
 	<AutoCommandBar name="ФормаКоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
-			<Button name="ЗаписатьНабор" id="65">
-				<Type>CommandBarButton</Type>
-				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ЗаписатьНабор</CommandName>
-				<Picture>
-					<xr:Ref>StdPicture.Write</xr:Ref>
-					<xr:LoadTransparent>true</xr:LoadTransparent>
-				</Picture>
-				<ExtendedTooltip name="ЗаписатьНаборРасширеннаяПодсказка" id="83"/>
-			</Button>
 			<Button name="ЗаписатьИЗакрытьНабор" id="66">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
 				<DefaultButton>true</DefaultButton>
-				<CommandName>Form.Command.ЗаписатьИЗакрытьНабор</CommandName>
+				<CommandName>Form.StandardCommand.WriteAndClose</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<BackColor>#FFE69B</BackColor>
+				<TextColor>#352B13</TextColor>
 				<Picture>
 					<xr:Ref>StdPicture.WriteAndClose</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
 				<ExtendedTooltip name="ЗаписатьИЗакрытьНаборРасширеннаяПодсказка" id="84"/>
+			</Button>
+			<Button name="ЗаписатьНабор" id="65">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.StandardCommand.Write</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<Picture>
+					<xr:Ref>StdPicture.Write</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<ExtendedTooltip name="ЗаписатьНаборРасширеннаяПодсказка" id="83"/>
 			</Button>
 		</ChildItems>
 	</AutoCommandBar>
@@ -92,7 +94,7 @@
 					<Button name="ЗначенияКонстантДобавитьНастройку" id="52">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ДобавитьНастройку</CommandName>
+						<CommandName>Form.Command.ДобавитьНастройку</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<Picture>
 							<xr:Ref>StdPicture.CreateListItem</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -102,7 +104,7 @@
 					<Button name="ЗначенияКонстантИзменитьНастройку" id="59">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ИзменитьНастройку</CommandName>
+						<CommandName>Form.Command.ИзменитьНастройку</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<Picture>
 							<xr:Ref>StdPicture.Change</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -112,28 +114,41 @@
 					<Button name="НастроитьОтбор" id="80">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.НастроитьОтбор</CommandName>
+						<CommandName>Form.Command.НастроитьОтбор</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<Picture>
 							<xr:Ref>StdPicture.DataCompositionFilter</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
 						<ExtendedTooltip name="НастроитьОтборРасширеннаяПодсказка" id="87"/>
 					</Button>
+					<Button name="ПереименоватьНастройку" id="122">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ПереименоватьНастройку</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.Change</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<ExtendedTooltip name="ПереименоватьНастройкуПодсказка" id="123"/>
+					</Button>
 					<Button name="ЗначенияКонстантИзменитьПометкуУдаленияНастройки" id="54">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
 						<CommandName>Form.Command.ИзменитьПометкуУдаленияНастройки</CommandName>
-						<Picture>
-							<xr:Ref>StdPicture.Delete</xr:Ref>
-							<xr:LoadTransparent>true</xr:LoadTransparent>
-						</Picture>
+						<Picture><xr:Ref>StdPicture.MarkToDelete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<LocationInCommandBar>InAdditionalSubmenu</LocationInCommandBar>
 						<ExtendedTooltip name="ЗначенияКонстантИзменитьПометкуУдаленияНастройкиРасширеннаяПодсказка" id="55"/>
+					</Button>
+					<Button name="ОчиститьПомеченные" id="120">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ОчиститьПомеченные</CommandName>
+						<Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<LocationInCommandBar>InAdditionalSubmenu</LocationInCommandBar>
+						<ExtendedTooltip name="ОчиститьПомеченныеПодсказка" id="121"/>
 					</Button>
 					<Button name="ПодтвердитьПроверкуВызовов" id="67">
 						<Type>CommandBarButton</Type>
 						<Visible>false</Visible>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ПодтвердитьПроверкуВызовов</CommandName>
+						<CommandName>Form.Command.ПодтвердитьПроверкуВызовов</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<Picture>
 							<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -148,6 +163,7 @@
 							<xr:Ref>StdPicture.GotoExternalURL</xr:Ref>
 							<xr:LoadTransparent>true</xr:LoadTransparent>
 						</Picture>
+						<LocationInCommandBar>InAdditionalSubmenu</LocationInCommandBar>
 						<ExtendedTooltip name="ПерейтиПоСсылкеРасширеннаяПодсказка" id="89"/>
 					</Button>
 				</ChildItems>
@@ -184,6 +200,7 @@
 			<ChildItems>
 				<InputField name="ЗначенияКонстантИмяКонстанты" id="79">
 					<DataPath>Объект.ЗначенияКонстант.ИмяКонстанты</DataPath>
+					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
@@ -192,9 +209,6 @@
 					</Title>
 					<ContextMenu name="ЗначенияКонстантИмяКонстантыКонтекстноеМеню" id="90"/>
 					<ExtendedTooltip name="ЗначенияКонстантИмяКонстантыРасширеннаяПодсказка" id="91"/>
-					<Events>
-						<Event name="OnChange">ЗначенияКонстантИмяПриИзменении</Event>
-					</Events>
 				</InputField>
 				<InputField name="ЗначенияКонстантПолноеИмяКонстанты" id="42">
 					<DataPath>Объект.ЗначенияКонстант.ПолноеИмяКонстанты</DataPath>
@@ -248,7 +262,7 @@
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Проверить вызовы</v8:content>
+							<v8:content>Приостановлена</v8:content>
 						</v8:item>
 					</Title>
 					<CheckBoxType>Auto</CheckBoxType>
@@ -257,6 +271,8 @@
 				</CheckBoxField>
 				<CheckBoxField name="ПометкаУдаления" id="71">
 					<DataPath>Объект.ЗначенияКонстант.ПометкаУдаления</DataPath>
+					<Visible>false</Visible>
+					<UserVisible><xr:Common>false</xr:Common></UserVisible>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -397,6 +413,10 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
+		<Command name="ПереименоватьНастройку" id="12">
+			<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Переименовать…</v8:content></v8:item></Title>
+			<Action>ПереименоватьНастройку</Action>
+		</Command>
 		<Command name="ПереименоватьНабор" id="1">
 			<Title>
 				<v8:item>
@@ -449,35 +469,17 @@
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Изменить настройку…</v8:content>
+					<v8:content>Изменить значение…</v8:content>
 				</v8:item>
 			</Title>
 			<Action>ИзменитьНастройку</Action>
 			<CurrentRowUse>Use</CurrentRowUse>
 		</Command>
-		<Command name="ЗаписатьНабор" id="5">
-			<Title>
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Записать</v8:content>
-				</v8:item>
-			</Title>
-			<Action>ЗаписатьНабор</Action>
-		</Command>
-		<Command name="ЗаписатьИЗакрытьНабор" id="6">
-			<Title>
-				<v8:item>
-					<v8:lang>ru</v8:lang>
-					<v8:content>Записать и закрыть</v8:content>
-				</v8:item>
-			</Title>
-			<Action>ЗаписатьИЗакрытьНабор</Action>
-		</Command>
 		<Command name="ПодтвердитьПроверкуВызовов" id="7">
 			<Title>
 				<v8:item>
 					<v8:lang>ru</v8:lang>
-					<v8:content>Подтвердить обновление обращений</v8:content>
+					<v8:content>Включить после проверки…</v8:content>
 				</v8:item>
 			</Title>
 			<Action>ПодтвердитьПроверкуВызовов</Action>
@@ -499,6 +501,10 @@
 				</v8:item>
 			</Title>
 			<Action>НастроитьОтбор</Action>
+		</Command>
+		<Command name="ОчиститьПомеченные" id="10">
+			<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Удалить помеченные настройки набора…</v8:content></v8:item></Title>
+			<Action>ОчиститьПомеченные</Action>
 		</Command>
 	</Commands>
 </Form>

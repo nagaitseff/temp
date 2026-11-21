@@ -30,7 +30,9 @@
 				<ChildItems>
 					<Button name="НастройкиПоказатьСписокЗначений" id="17">
 						<Type>CommandBarButton</Type>
-						<CommandName>Form.Command.ПоказатьСписокЗначений</CommandName>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ПоказатьСписокЗначений</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
 						<ExtendedTooltip name="НастройкиПоказатьСписокЗначенийРасширеннаяПодсказка" id="18"/>
 					</Button>
 				</ChildItems>
@@ -130,7 +132,7 @@
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Проверить вызовы</v8:content>
+							<v8:content>Приостановлена</v8:content>
 						</v8:item>
 					</Title>
 					<CheckBoxType>Auto</CheckBoxType>
@@ -139,6 +141,8 @@
 				</CheckBoxField>
 				<CheckBoxField name="ПометкаУдаления" id="30">
 					<DataPath>СтрокиНастроек.ПометкаУдаления</DataPath>
+					<Visible>false</Visible>
+					<UserVisible><xr:Common>false</xr:Common></UserVisible>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>
@@ -277,7 +281,7 @@
 					<Title>
 						<v8:item>
 							<v8:lang>ru</v8:lang>
-							<v8:content>Проверить вызовы</v8:content>
+							<v8:content>Приостановлена</v8:content>
 						</v8:item>
 					</Title>
 					<Type>
