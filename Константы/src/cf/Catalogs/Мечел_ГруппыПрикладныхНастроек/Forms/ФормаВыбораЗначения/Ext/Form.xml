@@ -62,7 +62,10 @@
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
 					<CommandName>Form.Command.НастроитьУсловияОтбора</CommandName>
-					<Picture><xr:Ref>StdPicture.DataCompositionFilter</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+					<Picture>
+						<xr:Ref>StdPicture.DataCompositionFilter</xr:Ref>
+						<xr:LoadTransparent>true</xr:LoadTransparent>
+					</Picture>
 					<ExtendedTooltip name="НастроитьУсловияОтбораРасширеннаяПодсказка" id="85"/>
 				</Button>
 				<LabelDecoration name="ПодсказкаОтбора" id="86">
@@ -88,29 +91,45 @@
 					<Button name="СписокДобавить" id="28">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Add</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-						<Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Add</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.CreateListItem</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="СписокДобавитьРасширеннаяПодсказка" id="29"/>
 					</Button>
 					<Button name="СписокУдалить" id="30">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-						<Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.Delete</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.Delete</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="СписокУдалитьРасширеннаяПодсказка" id="31"/>
 					</Button>
 					<Button name="СписокПереместитьВверх" id="32">
 						<Type>CommandBarButton</Type>
 						<Representation>Picture</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-						<Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveUp</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.MoveUp</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="СписокПереместитьВверхРасширеннаяПодсказка" id="33"/>
 					</Button>
 					<Button name="СписокПереместитьВниз" id="34">
 						<Type>CommandBarButton</Type>
 						<Representation>Picture</Representation>
-						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-						<Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<CommandName>Form.Item.СписокЗначенийНастройки.StandardCommand.MoveDown</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.MoveDown</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="СписокПереместитьВнизРасширеннаяПодсказка" id="35"/>
 					</Button>
 				</ChildItems>
@@ -211,9 +230,12 @@
 					<Representation>PictureAndText</Representation>
 					<DefaultButton>true</DefaultButton>
 					<CommandName>Form.Command.СохранитьЗначениеНастройки</CommandName>
-					<BackColor>#FFE69B</BackColor>
 					<TextColor>#352B13</TextColor>
-					<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+					<BackColor>#FFE69B</BackColor>
+					<Picture>
+						<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
+						<xr:LoadTransparent>true</xr:LoadTransparent>
+					</Picture>
 					<ExtendedTooltip name="СохранитьЗначениеНастройкиРасширеннаяПодсказка" id="11"/>
 				</Button>
 				<Button name="ОтменитьРедактирование" id="12">
@@ -230,7 +252,10 @@
 					<Type>UsualButton</Type>
 					<Representation>PictureAndText</Representation>
 					<CommandName>Form.Command.ОчиститьЗначение</CommandName>
-					<Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+					<Picture>
+						<xr:Ref>StdPicture.Delete</xr:Ref>
+						<xr:LoadTransparent>true</xr:LoadTransparent>
+					</Picture>
 					<ExtendedTooltip name="ОчиститьЗначениеРасширеннаяПодсказка" id="17"/>
 				</Button>
 			</ChildItems>

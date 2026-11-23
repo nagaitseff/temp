@@ -5,8 +5,43 @@
 	<AutoCommandBar name="КоманднаяПанель" id="-1">
 		<Autofill>false</Autofill>
 		<ChildItems>
-			<Button name="ЗаписатьКаталогИЗакрыть" id="10"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><DefaultButton>true</DefaultButton><BackColor>#FFE69B</BackColor><TextColor>#352B13</TextColor><CommandName>Form.StandardCommand.WriteAndClose</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Записать и закрыть</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.WriteAndClose</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ЗаписатьКаталогИЗакрытьПодсказка" id="11"/></Button>
-			<Button name="ЗаписатьКаталог" id="12"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.StandardCommand.Write</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Записать</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.Write</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ЗаписатьКаталогПодсказка" id="13"/></Button>
+			<Button name="ЗаписатьКаталогИЗакрыть" id="10">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<DefaultButton>true</DefaultButton>
+				<CommandName>Form.StandardCommand.WriteAndClose</CommandName>
+				<TextColor>#352B13</TextColor>
+				<BackColor>#FFE69B</BackColor>
+				<Picture>
+					<xr:Ref>StdPicture.WriteAndClose</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<Title>
+					<v8:item>
+						<v8:lang>ru</v8:lang>
+						<v8:content>Записать и закрыть</v8:content>
+					</v8:item>
+				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<ExtendedTooltip name="ЗаписатьКаталогИЗакрытьПодсказка" id="11"/>
+			</Button>
+			<Button name="ЗаписатьКаталог" id="12">
+				<Type>CommandBarButton</Type>
+				<Representation>PictureAndText</Representation>
+				<CommandName>Form.StandardCommand.Write</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.Write</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<Title>
+					<v8:item>
+						<v8:lang>ru</v8:lang>
+						<v8:content>Записать</v8:content>
+					</v8:item>
+				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<ExtendedTooltip name="ЗаписатьКаталогПодсказка" id="13"/>
+			</Button>
 		</ChildItems>
 	</AutoCommandBar>
 	<ChildItems>
@@ -19,7 +54,12 @@
 		</InputField>
 		<InputField name="Родитель" id="4">
 			<DataPath>Объект.Parent</DataPath>
-			<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Родительский каталог</v8:content></v8:item></Title>
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Родительский каталог</v8:content>
+				</v8:item>
+			</Title>
 			<EditMode>EnterOnInput</EditMode>
 			<ExtendedEditMultipleValues>true</ExtendedEditMultipleValues>
 			<ContextMenu name="РодительКонтекстноеМеню" id="5"/>

@@ -31,8 +31,12 @@
 					<Button name="НастройкиПоказатьСписокЗначений" id="17">
 						<Type>CommandBarButton</Type>
 						<Representation>PictureAndText</Representation>
-						<CommandName>Form.Command.ПоказатьСписокЗначений</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-						<Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+						<CommandName>Form.Command.ПоказатьСписокЗначений</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.ListViewModeList</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="НастройкиПоказатьСписокЗначенийРасширеннаяПодсказка" id="18"/>
 					</Button>
 				</ChildItems>
@@ -142,7 +146,9 @@
 				<CheckBoxField name="ПометкаУдаления" id="30">
 					<DataPath>СтрокиНастроек.ПометкаУдаления</DataPath>
 					<Visible>false</Visible>
-					<UserVisible><xr:Common>false</xr:Common></UserVisible>
+					<UserVisible>
+						<xr:Common>false</xr:Common>
+					</UserVisible>
 					<ReadOnly>true</ReadOnly>
 					<Title>
 						<v8:item>

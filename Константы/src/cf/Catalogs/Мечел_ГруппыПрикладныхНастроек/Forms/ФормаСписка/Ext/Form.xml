@@ -6,7 +6,7 @@
 			<Button name="СоздатьГруппу" id="25">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Item.Список.StandardCommand.CreateFolder</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<CommandName>Form.Item.Список.StandardCommand.CreateFolder</CommandName>
 				<Picture>
 					<xr:Ref>StdPicture.CreateFolder</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
@@ -17,27 +17,43 @@
 						<v8:content>Создать каталог</v8:content>
 					</v8:item>
 				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="СоздатьГруппуРасширеннаяПодсказка" id="28"/>
 			</Button>
 			<Button name="ФормаСоздатьНабор" id="21">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Item.Список.StandardCommand.Create</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<BackColor>#FFE69B</BackColor>
+				<CommandName>Form.Item.Список.StandardCommand.Create</CommandName>
 				<TextColor>#352B13</TextColor>
+				<BackColor>#FFE69B</BackColor>
 				<Picture>
 					<xr:Ref>StdPicture.CreateListItem</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
-				<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Создать набор</v8:content></v8:item></Title>
+				<Title>
+					<v8:item>
+						<v8:lang>ru</v8:lang>
+						<v8:content>Создать набор</v8:content>
+					</v8:item>
+				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ФормаСоздатьНаборРасширеннаяПодсказка" id="22"/>
 			</Button>
 			<Button name="ПометитьОбъект" id="40">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Item.Список.StandardCommand.SetDeletionMark</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Title><v8:item><v8:lang>ru</v8:lang><v8:content>Изменить пометку удаления</v8:content></v8:item></Title>
-				<Picture><xr:Ref>StdPicture.MarkToDelete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.Item.Список.StandardCommand.SetDeletionMark</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.MarkToDelete</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<Title>
+					<v8:item>
+						<v8:lang>ru</v8:lang>
+						<v8:content>Изменить пометку удаления</v8:content>
+					</v8:item>
+				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ПометитьОбъектПодсказка" id="41"/>
 			</Button>
 			<Button name="ЗаполнитьПримеры" id="26">
@@ -54,11 +70,12 @@
 			<Button name="ПроверитьПоставку" id="27">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ПроверитьПоставку</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
+				<CommandName>Form.Command.ПроверитьПоставку</CommandName>
 				<Picture>
 					<xr:Ref>StdPicture.ListSettings</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ПроверитьПоставкуРасширеннаяПодсказка" id="30"/>
 			</Button>
 			<Button name="ФормаОбновить" id="23">
@@ -76,7 +93,10 @@
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
 				<CommandName>Form.Command.ВыполнитьТесты</CommandName>
-				<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<Picture>
+					<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
 				<LocationInCommandBar>InAdditionalSubmenu</LocationInCommandBar>
 				<ExtendedTooltip name="ФормаВыполнитьТестыРасширеннаяПодсказка" id="20"/>
 			</Button>
@@ -97,9 +117,9 @@
 			<ExtendedTooltip name="СписокКомпоновщикНастроекПользовательскиеНастройкиРасширеннаяПодсказка" id="2"/>
 		</UsualGroup>
 		<Table name="Список" id="3">
+			<Representation>Tree</Representation>
 			<CommandBarLocation>None</CommandBarLocation>
 			<DefaultItem>true</DefaultItem>
-			<Representation>Tree</Representation>
 			<UseAlternationRowColor>true</UseAlternationRowColor>
 			<InitialTreeView>ExpandTopLevel</InitialTreeView>
 			<EnableStartDrag>true</EnableStartDrag>

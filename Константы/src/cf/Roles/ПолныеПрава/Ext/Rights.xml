@@ -149,6 +149,10 @@
 			<value>true</value>
 		</right>
 		<right>
+			<name>InteractiveDeleteMarked</name>
+			<value>true</value>
+		</right>
+		<right>
 			<name>InputByString</name>
 			<value>true</value>
 		</right>

@@ -11,47 +11,64 @@
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
 				<DefaultButton>true</DefaultButton>
-				<CommandName>Form.Command.Применить</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<BackColor>#FFE69B</BackColor>
+				<CommandName>Form.Command.Применить</CommandName>
 				<TextColor>#352B13</TextColor>
+				<BackColor>#FFE69B</BackColor>
 				<Picture>
 					<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
 					<xr:LoadTransparent>true</xr:LoadTransparent>
 				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ПрименитьРасширеннаяПодсказка" id="52"/>
 			</Button>
 			<Button name="Отменить" id="51">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.StandardCommand.Close</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Picture><xr:Ref>StdPicture.Stop</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.StandardCommand.Close</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.Stop</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
 				<Title>
 					<v8:item>
 						<v8:lang>ru</v8:lang>
 						<v8:content>Отмена</v8:content>
 					</v8:item>
 				</Title>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ОтменитьРасширеннаяПодсказка" id="53"/>
 			</Button>
 			<Button name="ВыбратьПоляОтчета" id="54">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ВыбратьПоляОтчета</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Picture><xr:Ref>StdPicture.Report</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.Command.ВыбратьПоляОтчета</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.Report</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ВыбратьПоляОтчетаРасширеннаяПодсказка" id="55"/>
 			</Button>
 			<Button name="ВыбратьПоляОбъекта" id="79">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ВыбратьПоляОбъекта</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.Command.ВыбратьПоляОбъекта</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.ListViewModeList</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ВыбратьПоляОбъектаРасширеннаяПодсказка" id="80"/>
 			</Button>
 			<Button name="ЗадатьПоляВручную" id="56">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.ЗадатьПоляВручную</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Picture><xr:Ref>StdPicture.ListSettings</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.Command.ЗадатьПоляВручную</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.ListSettings</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ЗадатьПоляВручнуюРасширеннаяПодсказка" id="57"/>
 			</Button>
 		</ChildItems>
@@ -89,14 +106,78 @@
 					<RowFilter xsi:nil="true"/>
 					<ContextMenu name="ПоляОтбораКонтекстноеМеню" id="61"/>
 					<AutoCommandBar name="ПоляОтбораКоманднаяПанель" id="62">
-				<Autofill>false</Autofill>
-				<ChildItems>
-					<Button name="ПоляОтбораAdd" id="820"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.Add</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Добавить поле</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораAddПодсказка" id="821"/></Button>
-					<Button name="ПоляОтбораDelete" id="822"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Удалить</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораDeleteПодсказка" id="823"/></Button>
-					<Button name="ПоляОтбораMoveUp" id="824"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Выше</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораMoveUpПодсказка" id="825"/></Button>
-					<Button name="ПоляОтбораMoveDown" id="826"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Ниже</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="ПоляОтбораMoveDownПодсказка" id="827"/></Button>
-				</ChildItems>
-			</AutoCommandBar>
+						<Autofill>false</Autofill>
+						<ChildItems>
+							<Button name="ПоляОтбораAdd" id="820">
+								<Type>CommandBarButton</Type>
+								<Representation>PictureAndText</Representation>
+								<CommandName>Form.Item.ПоляОтбора.StandardCommand.Add</CommandName>
+								<Picture>
+									<xr:Ref>StdPicture.CreateListItem</xr:Ref>
+									<xr:LoadTransparent>true</xr:LoadTransparent>
+								</Picture>
+								<Title>
+									<v8:item>
+										<v8:lang>ru</v8:lang>
+										<v8:content>Добавить поле</v8:content>
+									</v8:item>
+								</Title>
+								<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+								<ExtendedTooltip name="ПоляОтбораAddПодсказка" id="821"/>
+							</Button>
+							<Button name="ПоляОтбораDelete" id="822">
+								<Type>CommandBarButton</Type>
+								<Representation>PictureAndText</Representation>
+								<CommandName>Form.Item.ПоляОтбора.StandardCommand.Delete</CommandName>
+								<Picture>
+									<xr:Ref>StdPicture.Delete</xr:Ref>
+									<xr:LoadTransparent>true</xr:LoadTransparent>
+								</Picture>
+								<Title>
+									<v8:item>
+										<v8:lang>ru</v8:lang>
+										<v8:content>Удалить</v8:content>
+									</v8:item>
+								</Title>
+								<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+								<ExtendedTooltip name="ПоляОтбораDeleteПодсказка" id="823"/>
+							</Button>
+							<Button name="ПоляОтбораMoveUp" id="824">
+								<Type>CommandBarButton</Type>
+								<Representation>PictureAndText</Representation>
+								<CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveUp</CommandName>
+								<Picture>
+									<xr:Ref>StdPicture.MoveUp</xr:Ref>
+									<xr:LoadTransparent>true</xr:LoadTransparent>
+								</Picture>
+								<Title>
+									<v8:item>
+										<v8:lang>ru</v8:lang>
+										<v8:content>Выше</v8:content>
+									</v8:item>
+								</Title>
+								<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+								<ExtendedTooltip name="ПоляОтбораMoveUpПодсказка" id="825"/>
+							</Button>
+							<Button name="ПоляОтбораMoveDown" id="826">
+								<Type>CommandBarButton</Type>
+								<Representation>PictureAndText</Representation>
+								<CommandName>Form.Item.ПоляОтбора.StandardCommand.MoveDown</CommandName>
+								<Picture>
+									<xr:Ref>StdPicture.MoveDown</xr:Ref>
+									<xr:LoadTransparent>true</xr:LoadTransparent>
+								</Picture>
+								<Title>
+									<v8:item>
+										<v8:lang>ru</v8:lang>
+										<v8:content>Ниже</v8:content>
+									</v8:item>
+								</Title>
+								<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+								<ExtendedTooltip name="ПоляОтбораMoveDownПодсказка" id="827"/>
+							</Button>
+						</ChildItems>
+					</AutoCommandBar>
 					<ExtendedTooltip name="ПоляОтбораРасширеннаяПодсказка" id="63"/>
 					<SearchStringAddition name="ПоляОтбораСтрокаПоиска" id="93">
 						<AdditionSource>
@@ -195,16 +276,22 @@
 							<Type>UsualButton</Type>
 							<Representation>PictureAndText</Representation>
 							<CommandName>Form.Command.ИспользоватьПоля</CommandName>
-							<BackColor>#FFE69B</BackColor>
 							<TextColor>#352B13</TextColor>
-							<Picture><xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+							<BackColor>#FFE69B</BackColor>
+							<Picture>
+								<xr:Ref>StdPicture.AppearanceCheckIcon</xr:Ref>
+								<xr:LoadTransparent>true</xr:LoadTransparent>
+							</Picture>
 							<ExtendedTooltip name="ИспользоватьПоляРасширеннаяПодсказка" id="76"/>
 						</Button>
 						<Button name="ВернутьсяКУсловиям" id="77">
 							<Type>UsualButton</Type>
 							<Representation>PictureAndText</Representation>
 							<CommandName>Form.Command.ВернутьсяКУсловиям</CommandName>
-							<Picture><xr:Ref>StdPicture.Stop</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+							<Picture>
+								<xr:Ref>StdPicture.Stop</xr:Ref>
+								<xr:LoadTransparent>true</xr:LoadTransparent>
+							</Picture>
 							<ExtendedTooltip name="ВернутьсяКУсловиямРасширеннаяПодсказка" id="78"/>
 						</Button>
 					</ChildItems>
@@ -231,12 +318,108 @@
 			<AutoCommandBar name="НастройкиОтборКоманднаяПанель" id="32">
 				<Autofill>false</Autofill>
 				<ChildItems>
-					<Button name="НастройкиОтборAddFilterItem" id="520"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.AddFilterItem</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Добавить условие</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.CreateListItem</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборAddFilterItemПодсказка" id="521"/></Button>
-					<Button name="НастройкиОтборGroupFilterItems" id="522"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.GroupFilterItems</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Сгруппировать…</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.DataCompositionGroupFields</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборGroupFilterItemsПодсказка" id="523"/></Button>
-					<Button name="НастройкиОтборUngroup" id="524"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.Ungroup</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Разгруппировать</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.ListViewModeList</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборUngroupПодсказка" id="525"/></Button>
-					<Button name="НастройкиОтборDelete" id="526"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.Delete</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Удалить</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.Delete</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборDeleteПодсказка" id="527"/></Button>
-					<Button name="НастройкиОтборMoveUp" id="528"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveUp</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Выше</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveUp</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборMoveUpПодсказка" id="529"/></Button>
-					<Button name="НастройкиОтборMoveDown" id="530"><Type>CommandBarButton</Type><Representation>PictureAndText</Representation><CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveDown</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar><Title><v8:item><v8:lang>ru</v8:lang><v8:content>Ниже</v8:content></v8:item></Title><Picture><xr:Ref>StdPicture.MoveDown</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture><ExtendedTooltip name="НастройкиОтборMoveDownПодсказка" id="531"/></Button>
+					<Button name="НастройкиОтборAddFilterItem" id="520">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.AddFilterItem</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.CreateListItem</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Добавить условие</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборAddFilterItemПодсказка" id="521"/>
+					</Button>
+					<Button name="НастройкиОтборGroupFilterItems" id="522">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.GroupFilterItems</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.DataCompositionGroupFields</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Сгруппировать…</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборGroupFilterItemsПодсказка" id="523"/>
+					</Button>
+					<Button name="НастройкиОтборUngroup" id="524">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.Ungroup</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.ListViewModeList</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Разгруппировать</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборUngroupПодсказка" id="525"/>
+					</Button>
+					<Button name="НастройкиОтборDelete" id="526">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.Delete</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.Delete</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Удалить</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборDeleteПодсказка" id="527"/>
+					</Button>
+					<Button name="НастройкиОтборMoveUp" id="528">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveUp</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.MoveUp</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Выше</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборMoveUpПодсказка" id="529"/>
+					</Button>
+					<Button name="НастройкиОтборMoveDown" id="530">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Item.НастройкиОтбор.StandardCommand.MoveDown</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.MoveDown</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<Title>
+							<v8:item>
+								<v8:lang>ru</v8:lang>
+								<v8:content>Ниже</v8:content>
+							</v8:item>
+						</Title>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="НастройкиОтборMoveDownПодсказка" id="531"/>
+					</Button>
 				</ChildItems>
 			</AutoCommandBar>
 			<ExtendedTooltip name="НастройкиОтборРасширеннаяПодсказка" id="34"/>

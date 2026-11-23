@@ -6,8 +6,12 @@
 			<Button name="Обновить" id="1">
 				<Type>CommandBarButton</Type>
 				<Representation>PictureAndText</Representation>
-				<CommandName>Form.Command.Обновить</CommandName><LocationInCommandBar>InCommandBar</LocationInCommandBar>
-				<Picture><xr:Ref>StdPicture.Refresh</xr:Ref><xr:LoadTransparent>true</xr:LoadTransparent></Picture>
+				<CommandName>Form.Command.Обновить</CommandName>
+				<Picture>
+					<xr:Ref>StdPicture.Refresh</xr:Ref>
+					<xr:LoadTransparent>true</xr:LoadTransparent>
+				</Picture>
+				<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 				<ExtendedTooltip name="ОбновитьРасширеннаяПодсказка" id="14"/>
 			</Button>
 		</ChildItems>
