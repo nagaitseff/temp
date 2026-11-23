@@ -17,6 +17,18 @@
 				<Event name="OnChange">ГруппаПриИзменении</Event>
 			</Events>
 		</InputField>
+		<LabelDecoration name="ПредупреждениеОПриостановке" id="182">
+			<Visible>false</Visible>
+			<TextColor>#985000</TextColor>
+			<Title formatted="false">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>В этом наборе есть переименованные настройки. Они приостановлены до проверки вызовов.</v8:content>
+				</v8:item>
+			</Title>
+			<ContextMenu name="ПредупреждениеКонтекстноеМеню" id="183"/>
+			<ExtendedTooltip name="ПредупреждениеПодсказка" id="184"/>
+		</LabelDecoration>
 		<Table name="Настройки" id="4">
 			<ReadOnly>true</ReadOnly>
 			<ChangeRowSet>false</ChangeRowSet>
@@ -38,6 +50,17 @@
 						</Picture>
 						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
 						<ExtendedTooltip name="НастройкиПоказатьСписокЗначенийРасширеннаяПодсказка" id="18"/>
+					</Button>
+					<Button name="ПерейтиПоСсылке" id="180">
+						<Type>CommandBarButton</Type>
+						<Representation>PictureAndText</Representation>
+						<CommandName>Form.Command.ПерейтиПоСсылке</CommandName>
+						<Picture>
+							<xr:Ref>StdPicture.GotoExternalURL</xr:Ref>
+							<xr:LoadTransparent>true</xr:LoadTransparent>
+						</Picture>
+						<LocationInCommandBar>InCommandBar</LocationInCommandBar>
+						<ExtendedTooltip name="ПерейтиПоСсылкеПодсказка" id="181"/>
 					</Button>
 				</ChildItems>
 			</AutoCommandBar>
@@ -332,6 +355,16 @@
 		</Attribute>
 	</Attributes>
 	<Commands>
+		<Command name="ПерейтиПоСсылке" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Перейти по ссылке</v8:content>
+				</v8:item>
+			</Title>
+			<Action>ПерейтиПоСсылке</Action>
+			<CurrentRowUse>Use</CurrentRowUse>
+		</Command>
 		<Command name="ПоказатьСписокЗначений" id="1">
 			<Title>
 				<v8:item>
