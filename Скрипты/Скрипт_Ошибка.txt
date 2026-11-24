@@ -1,0 +1,6 @@
+  Masking supported pattern matches of %MECHEL_API_TOKEN%
+10:04:31  [Pipeline] {
+10:04:31  [Pipeline] bat
+10:04:33  2026-11-19T06:04:32 [INFO] [ПроверитьАПИ] Чтение списка агентов выполнено
+10:04:33  2026-11-19T06:04:32 [ERROR] [ПроверитьАПИ] Оркестратор Objects1C/GetInfobaseBlock: API code=5; Не указан параметр 'token'
+10:04:33  {Модуль C:\OneScript_2\lib\mechel2\src\Классы\АПИКлиент.os / Ошибка в строке: 466 / Оркестратор Objects1C/GetInfobaseBlock: API code=5; Не указан параметр 'token'}

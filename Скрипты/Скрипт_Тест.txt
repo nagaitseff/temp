@@ -1,0 +1,52 @@
+@Library('1c-utils')
+
+import io.libs.v8_utils
+
+def utils = new v8_utils()
+def MECHEL_TEST_INFOBASE = "ERP_DEV_NAGAYTSEV"
+
+pipeline {
+    parameters {
+        string(
+            name: 'LABEL',
+            defaultValue: 'erp_nightly',
+            description: 'Введите имя ноды для сборки проекта.'
+        )
+        credentials(
+            name: 'TOKEN',
+            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+            defaultValue: 'erp-restore-api-token',
+            required: true,
+            description: 'API-токен для блокировки информационной базы'
+        )
+    }
+
+    agent {
+        label "${params.LABEL}"
+    }
+
+    environment {
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+        BASH_PATH = 'C:\\Git\\bin\\bash.exe'
+        BASE_NAME = ''
+        REPO_PATH = '.'
+        LOCK = '789789789'
+        LOCK_FILE = "base_${env.BASE_NAME}.lock"
+        UNBLOCK_REG = 'true'
+    }
+
+    stages {
+        stage('Test API') {
+
+            steps {
+                script {
+                    withCredentials([string(credentialsId: params.TOKEN,
+                        variable: 'MECHEL_API_TOKEN')]) {
+                        bat '@chcp 65001 >nul\n@"C:\\OneScript_2\\bin\\oscript.exe" "C:\\OneScript_2\\api\\ПроверитьАПИ.os"'
+                    }
+                }
+            }
+        }
+    }
+}
