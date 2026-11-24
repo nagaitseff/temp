@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <opm-metadata xmlns="http://oscript.io/schemas/opm-metadata/1.0">
     <name>mechel</name>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <author>ERP team</author>
     <description>Клиент API оркестратора 1С и общие средства новых Jenkins-скриптов</description>
     <engine-version>2.1.0</engine-version>
