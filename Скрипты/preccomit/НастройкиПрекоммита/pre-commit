@@ -1,0 +1,2 @@
+#!/bin/sh
+oscript -encoding=utf-8 "C:\OneScript_2\lib\precommit4onec\src\main.os" precommit ./ -source-dir "src"
