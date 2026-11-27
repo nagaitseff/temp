@@ -12,7 +12,7 @@ chcp 65001 >nul
             run()
         } else {
             def bindings = [string(credentialsId: params.TOKEN, variable: 'MECHEL_API_TOKEN')]
-            if (env.MECHEL_RESTORE_MODE == 'restore') {
+            if (env.MECHEL_RESTORE_MODE == 'restore' && (action == 'create' || action == 'wait')) {
                 bindings.add(string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD'))
             }
             withCredentials(bindings) {
@@ -95,6 +95,7 @@ pipeline {
         MECHEL_ENTERPRISE_SCRIPT = 'C:\\OneScript_2\\api\\ЗапуститьОбработкуИБ.os'
         MECHEL_1C_EXE = 'C:\\Program Files\\1cv8\\8.3.27.2342\\bin\\1cv8.exe'
         MECHEL_EPF_FILE = 'tools/OS/fm_release.epf'
+        MECHEL_SESSION_PERMISSION_CODE = '789789789'
         MECHEL_ERP_DIR = 'erp-source'
         GIT_CREDENTIALS_ID = 'JenkinsReader'
     }
@@ -106,6 +107,7 @@ pipeline {
                     def mode = params.RESTORE_MODE ?: 'restore'
                     def guid = params.RESTORE_GUID?.trim() ?: ''
                     def waitMinutes = params.WAIT_TIMEOUT_MINUTES?.trim()
+                    env.MECHEL_SESSION_LOCK_ATTEMPTED = '0'
                     if (!params.TOKEN) {
                         error('Выберите Secret Text в параметре TOKEN.')
                     }
@@ -222,6 +224,18 @@ pipeline {
             }
         }
 
+        stage('Блокировка базы-приёмника') {
+            when {
+                expression { env.MECHEL_RESTORE_MODE == 'restore' }
+            }
+            steps {
+                script {
+                    env.MECHEL_SESSION_LOCK_ATTEMPTED = '1'
+                    runRestoreScript('lock', 'Запретить новые сеансы и установить код разрешения входа')
+                }
+            }
+        }
+
         stage('Создание пользователей Аналитик и Разработчик') {
             when {
                 expression { env.MECHEL_RESTORE_MODE == 'restore' }
@@ -240,7 +254,7 @@ pipeline {
                 }
                 cleanup {
                     script {
-                        runEnterpriseScript('cleanup', 'Удаление временных файлов запуска 1С')
+                        runEnterpriseScript('cleanup', 'Удаление временной копии обработки и файлов запуска 1С')
                     }
                 }
             }
@@ -260,6 +274,13 @@ pipeline {
             script {
                 if (env.MECHEL_RESTORE_GUID && env.MECHEL_RESTORE_COMPLETE != '1') {
                     echo "Проверить заявку можно в режиме wait с RESTORE_GUID=${env.MECHEL_RESTORE_GUID}."
+                }
+            }
+        }
+        cleanup {
+            script {
+                if (env.MECHEL_SESSION_LOCK_ATTEMPTED == '1') {
+                    runRestoreScript('unlock', 'Снять блокировку базы-приёмника')
                 }
             }
         }

@@ -1,6 +1,7 @@
 """Run the deployed OneScript entry point against a temporary local HTTP server."""
 
 import argparse
+from datetime import datetime, timedelta
 import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -17,6 +18,7 @@ FAILED_GUID = "75ad092f-15de-4928-a646-abe9d9fd1ea0"
 STATUS_ERROR_GUID = "493919e3-8aa5-4e45-b6dc-c31ed279e38a"
 TOKEN = "local+restore/token&?"
 PASSWORD = 'fixture+Pass9/"секрет'
+SESSION_CODE = "817398513"
 SOURCE = "Кластер:6541|Источник"
 TARGET = "Кластер:6541|Приёмник с пробелом"
 
@@ -26,6 +28,8 @@ def main():
     parser.add_argument("--oscript", default="oscript")
     args = parser.parse_args()
     calls = []
+    block_calls = []
+    block = {"SessionsLockEnabled": False, "LockScheduledJobs": True}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -42,6 +46,11 @@ def main():
 
         def do_POST(self):
             data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            if self.path == "/hs/Objects1C/SetInfobaseBlock":
+                block_calls.append(("POST", data))
+                block.update({key: value for key, value in data.items() if key not in ("token", "infobase", "comment")})
+                self.reply(0, block)
+                return
             calls.append(("POST", self.path, data))
             if data["targetinfobase"] == "Отклонённая ИБ":
                 self.reply("00.04", "", "Заявка отклонена тестовым API " + data["password"])
@@ -51,6 +60,10 @@ def main():
         def do_GET(self):
             request = urlsplit(self.path)
             params = parse_qs(request.query)
+            if request.path == "/hs/Objects1C/GetInfobaseBlock":
+                block_calls.append(("GET", params))
+                self.reply("00:00", block)
+                return
             calls.append(("GET", request.path, params))
             if params["guid"] == [STATUS_ERROR_GUID]:
                 self.reply("14.03", "", "Ошибка смены пароля " + PASSWORD)
@@ -95,7 +108,7 @@ def main():
                     encoding="utf-8", errors="replace", timeout=20,
                 )
                 output = completed.stdout + completed.stderr
-                for secret in (TOKEN, PASSWORD):
+                for secret in (TOKEN, PASSWORD, SESSION_CODE):
                     assert secret not in output and quote(secret, safe="") not in output
                 assert (completed.returncode == 0) == success, output
                 assert expected_message in output, output
@@ -146,6 +159,18 @@ def main():
                 run("create", "укажите MECHEL_RESTORE_USER", success=False,
                     MECHEL_ENTERPRISE_PASSWORD=PASSWORD, MECHEL_RESTORE_GUID_FILE="invalid/restore-guid.txt")
                 run("create", "MECHEL_API_TOKEN", success=False, MECHEL_API_TOKEN="")
+
+                restore_lock = {"MECHEL_RESTORE_MODE": "restore", "MECHEL_RESTORE_GUID": guid,
+                                "MECHEL_SESSION_PERMISSION_CODE": SESSION_CODE}
+                other_lock = {**restore_lock, "MECHEL_RESTORE_GUID": FAILED_GUID}
+                run("lock", "нужен режим restore", success=False, MECHEL_RESTORE_MODE="wait", MECHEL_RESTORE_GUID=guid)
+                run("lock", "защищена", success=False, MECHEL_RESTORE_TARGET="server:6541|ERP_YU", **restore_lock)
+                run("lock", "Блокировка начала сеансов подтверждена", MECHEL_LOG_LEVEL="DEBUG", **restore_lock)
+                run("lock", "блокировка другой операции", success=False, **other_lock)
+                run("unlock", "Снятие пропущено", **other_lock)
+                run("unlock", "Снята блокировка начала сеансов", **restore_lock)
+                run("unlock", "уже открыт", **restore_lock)
+                assert block["SessionsLockEnabled"] is False and block["LockScheduledJobs"] is True
             finally:
                 server.shutdown()
                 thread.join()
@@ -166,7 +191,20 @@ def main():
     for method, _, data in calls:
         if method == "POST":
             assert type(data["test"]) is int and type(data["makecopy"]) is bool
+    read_block = ("GET", {"infobase": [TARGET], "token": [TOKEN]})
+    lock_method, lock = block_calls[1]
+    assert lock_method == "POST"
+    started = datetime.fromisoformat(lock["LockBeginTime"])
+    assert datetime.fromisoformat(lock["LockEndTime"]) - started == timedelta(hours=3)
+    changes = {"token": TOKEN, "infobase": TARGET, "comment": default["comment"]}
+    assert lock == {**changes, "SessionsLockEnabled": True, "SessionStartPermissionCode": SESSION_CODE,
+                    "LockMessage": f"Подготовка базы Jenkins. Заявка {GUID}",
+                    "LockBeginTime": lock["LockBeginTime"], "LockEndTime": lock["LockEndTime"]}
+    assert type(lock["SessionsLockEnabled"]) is bool
+    assert block_calls == [read_block, ("POST", lock), read_block, read_block, read_block, read_block,
+                           ("POST", {**changes, "SessionsLockEnabled": False}), read_block]
     print("PASS: restoration payloads and password masking, protection of receivers, wait-only and repeat protection")
+    print("PASS: session lock payload and expiry, protected and foreign locks are untouched, own lock is released")
 
 
 if __name__ == "__main__":
