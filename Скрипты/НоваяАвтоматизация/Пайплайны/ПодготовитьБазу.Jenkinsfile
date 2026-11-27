@@ -50,11 +50,16 @@ def runEnterpriseScript(String action, String title, String logFile = 'fm-releas
     withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_CONFIG_DIR=' + outputDir,
              'MECHEL_ENTERPRISE_LOG=' + outputDir + '/' + logFile]) {
         def run = {
-            dir(env.MECHEL_ERP_DIR) {
+            def invoke = {
                 bat label: title, encoding: 'UTF-8', script: '''@echo off
 chcp 65001 >nul
 "%MECHEL_OSCRIPT%" -encoding=utf-8 "%MECHEL_ENTERPRISE_SCRIPT%" "%MECHEL_ENTERPRISE_ACTION%"
 '''
+            }
+            if (action == 'check' || action == 'run') {
+                dir(env.MECHEL_ERP_DIR) { invoke() }
+            } else {
+                invoke()
             }
         }
         if (action == 'cleanup') {
@@ -67,11 +72,23 @@ chcp 65001 >nul
     }
 }
 
-def runDesignerStep(String action, String title, String logFile) {
+def runClientStep(String action, String title, String logFile) {
     try {
         runEnterpriseScript(action, title, logFile)
     } finally {
-        runEnterpriseScript('cleanup', 'Удаление временных файлов конфигуратора', logFile)
+        runEnterpriseScript('cleanup', 'Удаление временных файлов запуска 1С', logFile)
+    }
+}
+
+def resolveToolkitFiles() {
+    def repositoryDir = ['plugins', 'НоваяАвтоматизация/plugins'].find {
+        fileExists(it + '/НастроитьInfostartToolkit.epf')
+    }
+    def toolkitDir = repositoryDir ? pwd() + '/' + repositoryDir : 'C:\\OneScript_2\\api\\plugins'
+    env.MECHEL_TOOLKIT_EPF = toolkitDir + '/НастроитьInfostartToolkit.epf'
+    env.MECHEL_TOOLKIT_CFE = toolkitDir + '/InfostartToolkitCORP.cfe'
+    if (!fileExists(env.MECHEL_TOOLKIT_EPF)) {
+        error('Для настройки Toolkit положите НастроитьInfostartToolkit.epf и InfostartToolkitCORP.cfe в C:\\OneScript_2\\api\\plugins.')
     }
 }
 
@@ -123,18 +140,23 @@ pipeline {
     }
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Ветка ERP для сборки и установки CF и Mechel. Пусто — восстановление и запуск EPF из develop')
-        string(name: 'SOURCE_INFOBASE', defaultValue: '', description: 'База-источник. Имя ИБ или СЕРВЕР:ПОРТ|ИмяИБ')
-        booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'Снять актуальную копию источника. Без флажка используется доступная копия')
-        string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'ВНИМАНИЕ. Содержимое этой базы будет заменено. Формат СЕРВЕР:ПОРТ|ИмяИБ')
-        booleanParam(name: 'CONFIRM_TARGET', defaultValue: false, description: 'Проверили источник и приёмник? Подтверждаю замену содержимого TARGET_INFOBASE')
-        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С для запуска обработки. Оркестратор установит ему пароль при восстановлении')
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Ветка ERP для сборки выбранных файлов и получения fm_release.epf. Пусто — develop')
+        booleanParam(name: 'RESTORE_COPY', defaultValue: false, description: 'Восстановить копию источника в приёмник перед выбранными действиями')
+        string(name: 'SOURCE_INFOBASE', defaultValue: '', description: 'Источник для RESTORE_COPY. Имя ИБ или СЕРВЕР:ПОРТ|ИмяИБ')
+        booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'При восстановлении снять актуальную копию источника')
+        string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'Тестовая база, в которой будут выполнены выбранные действия. Формат СЕРВЕР:ПОРТ|ИмяИБ')
+        booleanParam(name: 'CONFIRM_TARGET', defaultValue: false, description: 'Подтверждаю выполнение выбранных действий в TARGET_INFOBASE')
+        booleanParam(name: 'INSTALL_CF', defaultValue: false, description: 'Собрать 1Cv8.cf и установить основную конфигурацию')
+        booleanParam(name: 'INSTALL_MECHEL', defaultValue: true, description: 'Собрать Mechel.cfe, проверить применимость и установить расширение')
+        booleanParam(name: 'SETUP_TOOLKIT', defaultValue: false, description: 'При отсутствии установить Infostart Toolkit и назначить его роль трём пользователям')
+        booleanParam(name: 'RUN_MONOPOLY_UPDATE', defaultValue: false, description: 'Запустить обработчики обновления данных ERP после выбранных установок')
+        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С для выбранных действий и установки пароля при восстановлении')
         credentials(
             name: 'ENTERPRISE_PASSWORD',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
             defaultValue: 'erp-dataexchange-password',
             required: false,
-            description: 'Secret Text с новым паролем для ENTERPRISE_USER. Нужен в режиме restore'
+            description: 'Secret Text для ENTERPRISE_USER. Без восстановления выберите действующий пароль'
         )
         booleanParam(name: 'VERBOSE_LOG', defaultValue: false, description: 'Вывести подробный лог Mechel (DEBUG)')
         credentials(
@@ -145,8 +167,8 @@ pipeline {
             description: 'Secret Text с токеном оркестратора'
         )
         string(name: 'LABEL', defaultValue: 'erp_nightly', description: 'Windows-агент Jenkins')
-        choice(name: 'RESTORE_MODE', choices: ['restore', 'wait'],
-               description: 'restore — восстановить копию в приёмник, wait — проверить существующую заявку')
+        choice(name: 'RESTORE_MODE', choices: ['prepare', 'wait'],
+               description: 'prepare — выбранные действия, wait — только опрос существующей заявки')
         string(name: 'RESTORE_GUID', defaultValue: '', description: 'GUID ранее созданной заявки для режима wait')
         string(name: 'WAIT_TIMEOUT_MINUTES', defaultValue: '120', description: 'Максимальное время опроса в минутах')
     }
@@ -160,6 +182,7 @@ pipeline {
         MECHEL_1C_EXE = 'C:\\Program Files\\1cv8\\8.3.27.2342\\bin\\1cv8.exe'
         MECHEL_IBCMD_EXE = 'C:\\Program Files\\1cv8\\8.3.27.2342\\bin\\ibcmd.exe'
         MECHEL_EPF_FILE = 'tools/OS/fm_release.epf'
+        MECHEL_UPDATE_EPF = 'C:\\OneScript_2\\lib\\vanessa-runner\\epf\\ЗакрытьПредприятие.epf'
         MECHEL_ERP_DIR = 'erp-source'
         MECHEL_SESSION_PERMISSION_CODE = '789789789'
         GIT_CREDENTIALS_ID = 'JenkinsReader'
@@ -169,93 +192,116 @@ pipeline {
         stage('Проверка параметров') {
             steps {
                 script {
-                    def mode = params.RESTORE_MODE ?: 'restore'
+                    // Для настроек, сохранённых прежним Jenkinsfile.
+                    def mode = params.RESTORE_MODE == 'restore' ? 'prepare' : (params.RESTORE_MODE ?: 'prepare')
+                    def restoreCopy = mode == 'prepare' && params.RESTORE_COPY
                     def guid = params.RESTORE_GUID?.trim() ?: ''
                     def waitMinutes = params.WAIT_TIMEOUT_MINUTES?.trim()
                     env.MECHEL_SESSION_LOCK_ATTEMPTED = '0'
-                    env.MECHEL_BUILD_CONFIGURATION = '0'
+                    env.MECHEL_RESTORE_MODE = restoreCopy ? 'restore' : mode
+                    env.MECHEL_LOG_LEVEL = params.VERBOSE_LOG ? 'DEBUG' : 'INFO'
                     if (!params.TOKEN) {
                         error('Выберите Secret Text в параметре TOKEN.')
                     }
-                    if (!waitMinutes || !(waitMinutes ==~ /[1-9][0-9]*/) || !waitMinutes.isInteger()) {
+                    if ((mode == 'wait' || restoreCopy) &&
+                        (!waitMinutes || !(waitMinutes ==~ /[1-9][0-9]*/) || !waitMinutes.isInteger())) {
                         error('WAIT_TIMEOUT_MINUTES должен быть положительным целым числом.')
                     }
-                    if (!fileExists(env.MECHEL_OSCRIPT) || !fileExists(env.MECHEL_RESTORE_SCRIPT)) {
-                        error('Проверьте наличие OneScript и ВосстановитьИБ.os на агенте в C:\\OneScript_2.')
+                    if (!fileExists(env.MECHEL_OSCRIPT)) {
+                        error('Проверьте наличие OneScript на агенте в C:\\OneScript_2.')
+                    }
+                    if ((mode == 'wait' || restoreCopy) && !fileExists(env.MECHEL_RESTORE_SCRIPT)) {
+                        error('Проверьте наличие ВосстановитьИБ.os на агенте.')
                     }
 
-                    env.MECHEL_RESTORE_MODE = mode
-                    env.MECHEL_RESTORE_WAIT_MINUTES = waitMinutes
-                    env.MECHEL_LOG_LEVEL = params.VERBOSE_LOG ? 'DEBUG' : 'INFO'
+                    env.MECHEL_RESTORE_WAIT_MINUTES = waitMinutes ?: ''
+                    env.MECHEL_RESTORE_GUID = guid
                     if (mode == 'wait') {
                         if (!(guid ==~ /(?i)[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/)) {
                             error('В режиме wait укажите GUID существующей заявки в RESTORE_GUID.')
                         }
                         currentBuild.description = "Опрос заявки ${guid}"
-                    } else {
-                        if (mode != 'restore' || guid) {
-                            error('Для новой заявки выберите restore и оставьте RESTORE_GUID пустым.')
-                        }
+                        return
+                    }
+                    if (mode != 'prepare' || guid) {
+                        error('Для подготовки базы выберите prepare и оставьте RESTORE_GUID пустым.')
+                    }
+
+                    def installCF = params.INSTALL_CF == true
+                    def installMechel = params.INSTALL_MECHEL != false
+                    def setupToolkit = params.SETUP_TOOLKIT == true
+                    def update = params.RUN_MONOPOLY_UPDATE == true
+                    def build = installCF || installMechel
+                    def target = params.TARGET_INFOBASE?.trim()
+                    def branch = params.BRANCH_NAME?.trim() ?: 'develop'
+                    def enterpriseUser = params.ENTERPRISE_USER?.trim()
+                    if (!target || !params.CONFIRM_TARGET) {
+                        error('Укажите TARGET_INFOBASE, сверьте адрес и отметьте CONFIRM_TARGET.')
+                    }
+                    if (!isBranchNameValid(branch)) {
+                        error('Укажите корректное имя ветки в BRANCH_NAME, например hotfix/2.5.27.107.')
+                    }
+                    if (!enterpriseUser || !params.ENTERPRISE_PASSWORD) {
+                        error('Укажите ENTERPRISE_USER и выберите Secret Text в ENTERPRISE_PASSWORD.')
+                    }
+                    if (!fileExists(env.MECHEL_ENTERPRISE_SCRIPT) || !fileExists(env.MECHEL_LOCK_SCRIPT)) {
+                        error('Проверьте ЗапуститьОбработкуИБ.os и БлокировкаИБ.os в C:\\OneScript_2\\api на агенте.')
+                    }
+                    if (build && (!fileExists(env.MECHEL_BUILD_SCRIPT) || !fileExists(env.MECHEL_IBCMD_EXE))) {
+                        error('Для сборки нужны СобратьКонфигурациюИБ.os и ibcmd.exe 8.3.27.2342 на агенте.')
+                    }
+                    if (update && !fileExists(env.MECHEL_UPDATE_EPF)) {
+                        error('Для монопольного обновления нужна обработка vanessa-runner ЗакрытьПредприятие.epf на агенте.')
+                    }
+                    if (setupToolkit) {
+                        resolveToolkitFiles()
+                    }
+
+                    env.MECHEL_RESTORE_TARGET = target
+                    env.MECHEL_ENTERPRISE_USER = enterpriseUser
+                    env.MECHEL_ERP_BRANCH = branch
+                    env.MECHEL_BUILD_SELECTION = installCF ? (installMechel ? 'both' : 'cf') : (installMechel ? 'cfe' : '')
+                    env.MECHEL_RUN_DIR = "mechel-restore/${env.BUILD_NUMBER}"
+                    currentBuild.description = "Подготовка ${target}"
+                    if (restoreCopy) {
                         def source = params.SOURCE_INFOBASE?.trim()
-                        def target = params.TARGET_INFOBASE?.trim()
-                        def requestedBranch = params.BRANCH_NAME?.trim()
-                        def branch = requestedBranch ?: 'develop'
-                        def enterpriseUser = params.ENTERPRISE_USER?.trim()
-                        if (!source || !target || source.equalsIgnoreCase(target)) {
+                        if (!source || source.equalsIgnoreCase(target)) {
                             error('Укажите разные SOURCE_INFOBASE и TARGET_INFOBASE.')
                         }
-                        if (!isBranchNameValid(branch)) {
-                            error('Укажите корректное имя ветки в BRANCH_NAME, например hotfix/2.5.27.107.')
-                        }
-                        if (!enterpriseUser || !params.ENTERPRISE_PASSWORD) {
-                            error('Укажите ENTERPRISE_USER и выберите Secret Text в ENTERPRISE_PASSWORD.')
-                        }
-                        if (!fileExists(env.MECHEL_ENTERPRISE_SCRIPT) || !fileExists(env.MECHEL_LOCK_SCRIPT)) {
-                            error('Проверьте ЗапуститьОбработкуИБ.os и БлокировкаИБ.os в C:\\OneScript_2\\api на агенте.')
-                        }
-                        if (requestedBranch && (!fileExists(env.MECHEL_BUILD_SCRIPT) || !fileExists(env.MECHEL_IBCMD_EXE))) {
-                            error('Для сборки нужны СобратьКонфигурациюИБ.os и ibcmd.exe 8.3.27.2342 на агенте.')
-                        }
                         env.MECHEL_RESTORE_SOURCE = source
-                        env.MECHEL_RESTORE_TARGET = target
-                        runRestoreScript('check', 'Проверка источника и защиты базы-приёмника')
-                        if (!params.CONFIRM_TARGET) {
-                            error('Сверьте направление восстановления в логе и отметьте CONFIRM_TARGET.')
-                        }
                         env.MECHEL_RESTORE_MAKE_COPY = params.MAKE_COPY ? '1' : '0'
-                        env.MECHEL_ENTERPRISE_USER = enterpriseUser
-                        env.MECHEL_ERP_BRANCH = branch
-                        env.MECHEL_BUILD_CONFIGURATION = requestedBranch ? '1' : '0'
-                        env.MECHEL_RUN_DIR = "mechel-restore/${env.BUILD_NUMBER}"
                         env.MECHEL_RESTORE_GUID_FILE = "${env.MECHEL_RUN_DIR}/restore-guid.txt"
-                        currentBuild.description = "${mode}: ${source} → ${target}"
+                        currentBuild.description = "${source} → ${target}"
+                        runRestoreScript('check', 'Проверка источника и защиты базы-приёмника')
                     }
-                    env.MECHEL_RESTORE_GUID = guid
-                    echo "Режим ${mode}. Скрипт ${env.MECHEL_RESTORE_SCRIPT}."
+                    runEnterpriseScript('check-login', 'Проверить адрес базы, клиент 1С и параметры входа')
                 }
             }
         }
 
         stage('Обновление репозитория') {
             when {
-                expression { env.MECHEL_RESTORE_MODE == 'restore' }
+                expression { env.MECHEL_RESTORE_MODE != 'wait' }
             }
             steps {
                 script {
                     updateErpCheckout()
-                    runEnterpriseScript('check', 'Проверка адреса ИБ, платформы 1С, обработки и параметров входа')
+                    runEnterpriseScript('check', 'Проверить fm_release.epf из выбранной ветки')
                 }
             }
         }
 
-        stage('Сборка 1Cv8.cf и Mechel.cfe') {
+        stage('Сборка выбранных файлов 1С') {
             when {
-                expression { env.MECHEL_BUILD_CONFIGURATION == '1' }
+                expression { env.MECHEL_RESTORE_MODE != 'wait' && env.MECHEL_BUILD_SELECTION }
             }
             steps {
                 script {
-                    runBuildScript('build', 'Собрать основную конфигурацию и расширение из XML')
-                    archiveArtifacts artifacts: "${env.MECHEL_RUN_DIR}/1Cv8.cf,${env.MECHEL_RUN_DIR}/Mechel.cfe"
+                    runBuildScript('build', 'Собрать выбранные файлы из XML')
+                    def files = []
+                    if (env.MECHEL_BUILD_SELECTION != 'cfe') { files << "${env.MECHEL_RUN_DIR}/1Cv8.cf" }
+                    if (env.MECHEL_BUILD_SELECTION != 'cf') { files << "${env.MECHEL_RUN_DIR}/Mechel.cfe" }
+                    archiveArtifacts artifacts: files.join(',')
                 }
             }
             post {
@@ -281,6 +327,9 @@ pipeline {
         }
 
         stage('Восстановление базы') {
+            when {
+                expression { env.MECHEL_RESTORE_MODE in ['restore', 'wait'] }
+            }
             steps {
                 script {
                     runRestoreScript('wait', 'Опросить статус восстановления')
@@ -289,9 +338,9 @@ pipeline {
             }
         }
 
-        stage('Подготовка восстановленной базы') {
+        stage('Подготовка базы-приёмника') {
             when {
-                expression { env.MECHEL_RESTORE_MODE == 'restore' }
+                expression { env.MECHEL_RESTORE_MODE != 'wait' }
             }
             options {
                 timeout(time: 165, unit: 'MINUTES')
@@ -323,7 +372,7 @@ pipeline {
                     }
                     post {
                         unsuccessful {
-                            echo 'Восстановление завершено. Проверьте запуск 1С:Предприятия и лог fm-release.log.'
+                            echo 'Проверьте лог выполнения обработки fm-release.log.'
                         }
                         cleanup {
                             script {
@@ -335,24 +384,57 @@ pipeline {
 
                 stage('Установка основной конфигурации') {
                     when {
-                        expression { env.MECHEL_BUILD_CONFIGURATION == '1' }
+                        expression { params.INSTALL_CF == true }
                     }
                     steps {
                         script {
-                            runDesignerStep('apply-cf', 'Загрузить 1Cv8.cf и монопольно обновить конфигурацию базы', 'apply-cf.log')
+                            runClientStep('apply-cf', 'Загрузить 1Cv8.cf и монопольно обновить конфигурацию базы', 'apply-cf.log')
                         }
                     }
                 }
 
                 stage('Установка расширения Mechel') {
                     when {
-                        expression { env.MECHEL_BUILD_CONFIGURATION == '1' }
+                        expression { params.INSTALL_MECHEL != false }
                     }
                     steps {
                         script {
-                            runDesignerStep('load-cfe', 'Загрузить Mechel.cfe', 'load-mechel.log')
-                            runDesignerStep('check-cfe', 'Проверить применимость Mechel', 'check-mechel.log')
-                            runDesignerStep('apply-cfe', 'Применить расширение Mechel', 'apply-mechel.log')
+                            runClientStep('load-cfe', 'Загрузить Mechel.cfe', 'load-mechel.log')
+                            runClientStep('check-cfe', 'Проверить применимость Mechel', 'check-mechel.log')
+                            runClientStep('apply-cfe', 'Применить расширение Mechel', 'apply-mechel.log')
+                        }
+                    }
+                }
+
+                stage('Установка Infostart Toolkit') {
+                    when {
+                        expression { params.SETUP_TOOLKIT }
+                    }
+                    steps {
+                        script {
+                            runClientStep('install-toolkit', 'Проверить наличие и при необходимости установить Toolkit', 'install-toolkit.log')
+                        }
+                    }
+                }
+
+                stage('Монопольное обновление ERP') {
+                    when {
+                        expression { params.RUN_MONOPOLY_UPDATE }
+                    }
+                    steps {
+                        script {
+                            runClientStep('update', 'Запустить обработчики обновления данных ERP', 'update-erp.log')
+                        }
+                    }
+                }
+
+                stage('Права Infostart Toolkit') {
+                    when {
+                        expression { params.SETUP_TOOLKIT }
+                    }
+                    steps {
+                        script {
+                            runClientStep('toolkit-roles', 'Назначить полную роль Toolkit указанным пользователям', 'toolkit-roles.log')
                         }
                     }
                 }

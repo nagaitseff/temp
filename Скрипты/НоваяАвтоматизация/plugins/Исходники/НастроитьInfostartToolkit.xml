@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" version="2.20">
+	<ExternalDataProcessor uuid="bf290855-c9f6-42f4-8a85-f93eb7d50333">
+		<InternalInfo>
+			<xr:ContainedObject>
+				<xr:ClassId>c3831ec8-d8d5-4f93-8a22-f9bfae07327f</xr:ClassId>
+				<xr:ObjectId>71030653-1a1b-44f6-933e-561b09d92e8c</xr:ObjectId>
+			</xr:ContainedObject>
+			<xr:GeneratedType name="ExternalDataProcessorObject.НастроитьInfostartToolkit" category="Object">
+				<xr:TypeId>b607d203-8e60-45c3-a1d6-45a40ac95ef7</xr:TypeId>
+				<xr:ValueId>afae85c8-92f8-4794-92a6-c2cc748ceb84</xr:ValueId>
+			</xr:GeneratedType>
+		</InternalInfo>
+		<Properties>
+			<Name>НастроитьInfostartToolkit</Name>
+			<Synonym>
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Настройка Infostart Toolkit</v8:content>
+				</v8:item>
+			</Synonym>
+			<DefaultForm>ExternalDataProcessor.НастроитьInfostartToolkit.Form.Форма</DefaultForm>
+		</Properties>
+		<ChildObjects>
+			<Form>Форма</Form>
+		</ChildObjects>
+	</ExternalDataProcessor>
+</MetaDataObject>
