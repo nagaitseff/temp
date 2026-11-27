@@ -61,6 +61,7 @@ def main():
         script = agent / "api" / "ВосстановитьИБ.os"
         script.parent.mkdir()
         shutil.copy2(here.parent / script.name, script)
+        shutil.copy2(here.parent / "ЗащитаПриемника.os", script.parent)
 
         with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
             thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -94,6 +95,13 @@ def main():
                 return output
 
             try:
+                run("check", "Проверены адреса восстановления", MECHEL_API_TOKEN="", MECHEL_RESTORE_SOURCE="ERP_YU")
+                for name in ("ERP_KGOK_DAILY", "ERP_YU_DAILY", "ERP_YKUZ_DAILY", "ERP_YU", "ERP_KGOK", "ERP_YKUZ"):
+                    run("check", f"База {name} защищена", success=False,
+                        MECHEL_RESTORE_TARGET=f"server:6541| {name.lower()} ")
+                    run("create", f"База {name} защищена", success=False, MECHEL_RESTORE_TARGET=name)
+                run("check", "формате СЕРВЕР:ПОРТ", success=False, MECHEL_RESTORE_TARGET="ERP_DEV")
+                assert not (agent / "mechel-restore").exists()
                 output = run("create", f"Заявка принята. GUID: {GUID}", MECHEL_LOG_LEVEL="INFO")
                 assert "[DEBUG]" not in output
                 guid_file = agent / env["MECHEL_RESTORE_GUID_FILE"]
@@ -140,7 +148,7 @@ def main():
     for method, _, data in calls:
         if method == "POST":
             assert type(data["test"]) is int and type(data["makecopy"]) is bool
-    print("PASS: test/restore payloads, wait-only mode, GUID file, failure and repeat protection")
+    print("PASS: protected receivers, test/restore payloads, wait-only mode, GUID file, failure and repeat protection")
 
 
 if __name__ == "__main__":
