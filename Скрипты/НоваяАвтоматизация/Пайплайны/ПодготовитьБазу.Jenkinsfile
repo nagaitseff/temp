@@ -45,6 +45,32 @@ chcp 65001 >nul
     }
 }
 
+def removeBuildFiles() {
+    def runDir = env.MECHEL_RUN_DIR
+    if (!runDir || !env.MECHEL_BUILD_SELECTION || !fileExists(runDir)) {
+        return
+    }
+    dir(runDir) {
+        bat label: 'Удалить файлы сборки 1С', encoding: 'UTF-8', script: '''@echo off
+chcp 65001 >nul
+setlocal
+set "cleanupFailed=0"
+for %%F in (1Cv8.cf Mechel.cfe) do (
+    if exist "%%F" (
+        if not exist "%%F\\" del /f /q "%%F"
+        if exist "%%F" (
+            echo Не удалось удалить %%F
+            set "cleanupFailed=1"
+        ) else (
+            echo Удалён %%F
+        )
+    )
+)
+exit /b %cleanupFailed%
+'''
+    }
+}
+
 def runEnterpriseScript(String action, String title, String logFile = 'fm-release.log') {
     def outputDir = pwd() + '/' + env.MECHEL_RUN_DIR
     withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_CONFIG_DIR=' + outputDir,
@@ -321,10 +347,6 @@ pipeline {
             steps {
                 script {
                     runBuildScript('build', 'Собрать выбранные файлы из XML')
-                    def files = []
-                    if (env.MECHEL_BUILD_SELECTION != 'cfe') { files << "${env.MECHEL_RUN_DIR}/1Cv8.cf" }
-                    if (env.MECHEL_BUILD_SELECTION != 'cf') { files << "${env.MECHEL_RUN_DIR}/Mechel.cfe" }
-                    archiveArtifacts artifacts: files.join(',')
                 }
             }
             post {
@@ -483,8 +505,12 @@ pipeline {
         }
         cleanup {
             script {
-                if (env.MECHEL_SESSION_LOCK_ATTEMPTED == '1') {
-                    runLockScript('unlock', 'Снять блокировку базы-приёмника')
+                try {
+                    removeBuildFiles()
+                } finally {
+                    if (env.MECHEL_SESSION_LOCK_ATTEMPTED == '1') {
+                        runLockScript('unlock', 'Снять блокировку базы-приёмника')
+                    }
                 }
             }
         }
