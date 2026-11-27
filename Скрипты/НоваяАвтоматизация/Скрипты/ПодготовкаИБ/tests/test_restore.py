@@ -91,13 +91,16 @@ def main():
                 assert TOKEN not in output and quote(TOKEN, safe="") not in output
                 assert (completed.returncode == 0) == success, output
                 assert expected_message in output, output
+                return output
 
             try:
-                run("create", f"Заявка принята. GUID: {GUID}")
+                output = run("create", f"Заявка принята. GUID: {GUID}", MECHEL_LOG_LEVEL="INFO")
+                assert "[DEBUG]" not in output
                 guid_file = agent / env["MECHEL_RESTORE_GUID_FILE"]
                 guid = guid_file.read_text(encoding="ascii").strip()
                 assert guid == GUID and not Path(str(guid_file) + ".pending").exists()
-                run("wait", "завершена со статусом 0", MECHEL_RESTORE_GUID=guid)
+                output = run("wait", "завершена со статусом 0", MECHEL_RESTORE_GUID=guid, MECHEL_LOG_LEVEL="DEBUG")
+                assert "[DEBUG]" in output and "GET loading1c/status" in output
                 run("create", "уже была попытка отправки", success=False)
                 run("create", "GUID уже задан", success=False, MECHEL_RESTORE_GUID=guid)
                 run("wait", "с ошибкой", success=False, MECHEL_RESTORE_GUID=FAILED_GUID)

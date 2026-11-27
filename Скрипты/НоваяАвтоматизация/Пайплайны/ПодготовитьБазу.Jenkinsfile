@@ -11,12 +11,18 @@ chcp 65001 >nul
 
 def runEnterpriseScript(String action, String title) {
     def logPath = pwd() + '/' + env.MECHEL_FIRST_START_LOG
-    withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_ENTERPRISE_LOG=' + logPath]) {
-        dir(env.MECHEL_ERP_DIR) {
-            bat label: title, encoding: 'UTF-8', script: '''@echo off
+    def bindings = [string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD')]
+    if (action != 'run') {
+        bindings.add(string(credentialsId: params.ENTERPRISE_CURRENT_PASSWORD, variable: 'MECHEL_ENTERPRISE_CURRENT_PASSWORD'))
+    }
+    withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_ENTERPRISE_LOG=' + logPath, 'MECHEL_ENTERPRISE_CURRENT_PASSWORD=']) {
+        withCredentials(bindings) {
+            dir(env.MECHEL_ERP_DIR) {
+                bat label: title, encoding: 'UTF-8', script: '''@echo off
 chcp 65001 >nul
 "%MECHEL_OSCRIPT%" -encoding=utf-8 "%MECHEL_ENTERPRISE_SCRIPT%" "%MECHEL_ENTERPRISE_ACTION%"
 '''
+            }
         }
     }
 }
@@ -39,7 +45,26 @@ pipeline {
     }
 
     parameters {
-        string(name: 'LABEL', defaultValue: 'erp_nightly', description: 'Windows-агент Jenkins')
+        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Ветка ERP, например hotfix/2.5.27.107. Если пусто, используется develop')
+        string(name: 'SOURCE_INFOBASE', defaultValue: '', description: 'База-источник. Имя ИБ или СЕРВЕР:ПОРТ|ИмяИБ')
+        booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'Снять актуальную копию источника. Без флажка используется доступная копия')
+        string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'База-приёмник в формате СЕРВЕР:ПОРТ|ИмяИБ')
+        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С с правами администратора для смены пароля и запуска обработки')
+        credentials(
+            name: 'ENTERPRISE_CURRENT_PASSWORD',
+            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+            defaultValue: 'erp-dataexchange-current-password',
+            required: false,
+            description: 'Secret Text с текущим паролем ENTERPRISE_USER из копии источника. Нужен в режиме restore'
+        )
+        credentials(
+            name: 'ENTERPRISE_PASSWORD',
+            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
+            defaultValue: 'erp-dataexchange-password',
+            required: false,
+            description: 'Secret Text с новым паролем для ENTERPRISE_USER. Нужен в режиме restore'
+        )
+        booleanParam(name: 'VERBOSE_LOG', defaultValue: false, description: 'Вывести подробный лог Mechel (DEBUG)')
         credentials(
             name: 'TOKEN',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
@@ -47,13 +72,9 @@ pipeline {
             required: true,
             description: 'Secret Text с токеном оркестратора'
         )
+        string(name: 'LABEL', defaultValue: 'erp_nightly', description: 'Windows-агент Jenkins')
         choice(name: 'RESTORE_MODE', choices: ['restore', 'wait'],
                description: 'restore — восстановить копию в приёмник, wait — проверить существующую заявку')
-        string(name: 'SOURCE_INFOBASE', defaultValue: '', description: 'Источник, имя ИБ или СЕРВЕР:ПОРТ|ИмяИБ')
-        string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'Существующий приёмник в формате СЕРВЕР:ПОРТ|ИмяИБ')
-        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Ветка ERP, например hotfix/2.5.27.107. Если пусто, используется develop')
-        booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'Создать свежую копию источника перед восстановлением')
-        string(name: 'ENTERPRISE_USER', defaultValue: '', description: 'Имя пользователя 1С для запуска обработки (/N). Если пусто, вход под Windows-учёткой агента')
         string(name: 'RESTORE_GUID', defaultValue: '', description: 'GUID ранее созданной заявки для режима wait')
         string(name: 'WAIT_TIMEOUT_MINUTES', defaultValue: '120', description: 'Максимальное время опроса в минутах')
     }
@@ -69,7 +90,7 @@ pipeline {
     }
 
     stages {
-        stage('Проверить параметры') {
+        stage('Проверка параметров') {
             steps {
                 script {
                     def mode = params.RESTORE_MODE ?: 'restore'
@@ -87,6 +108,7 @@ pipeline {
 
                     env.MECHEL_RESTORE_MODE = mode
                     env.MECHEL_RESTORE_WAIT_MINUTES = waitMinutes
+                    env.MECHEL_LOG_LEVEL = params.VERBOSE_LOG ? 'DEBUG' : 'INFO'
                     if (mode == 'wait') {
                         if (!(guid ==~ /(?i)[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/)) {
                             error('В режиме wait укажите GUID существующей заявки в RESTORE_GUID.')
@@ -99,11 +121,15 @@ pipeline {
                         def source = params.SOURCE_INFOBASE?.trim()
                         def target = params.TARGET_INFOBASE?.trim()
                         def branch = params.BRANCH_NAME?.trim() ?: 'develop'
+                        def enterpriseUser = params.ENTERPRISE_USER?.trim()
                         if (!source || !target || source.equalsIgnoreCase(target)) {
                             error('Укажите разные SOURCE_INFOBASE и TARGET_INFOBASE.')
                         }
                         if (!isBranchNameValid(branch)) {
                             error('Укажите корректное имя ветки в BRANCH_NAME, например hotfix/2.5.27.107.')
+                        }
+                        if (!enterpriseUser || !params.ENTERPRISE_CURRENT_PASSWORD || !params.ENTERPRISE_PASSWORD) {
+                            error('Укажите ENTERPRISE_USER и выберите два Secret Text в ENTERPRISE_CURRENT_PASSWORD и ENTERPRISE_PASSWORD.')
                         }
                         if (!fileExists(env.MECHEL_ENTERPRISE_SCRIPT)) {
                             error('Скопируйте ЗапуститьОбработкуИБ.os в C:\\OneScript_2\\api на агенте.')
@@ -111,7 +137,7 @@ pipeline {
                         env.MECHEL_RESTORE_SOURCE = source
                         env.MECHEL_RESTORE_TARGET = target
                         env.MECHEL_RESTORE_MAKE_COPY = params.MAKE_COPY ? '1' : '0'
-                        env.MECHEL_ENTERPRISE_USER = params.ENTERPRISE_USER?.trim() ?: ''
+                        env.MECHEL_ENTERPRISE_USER = enterpriseUser
                         env.MECHEL_ERP_BRANCH = branch
                         env.MECHEL_RESTORE_GUID_FILE = "mechel-restore/${env.BUILD_NUMBER}/restore-guid.txt"
                         env.MECHEL_FIRST_START_LOG = "mechel-restore/${env.BUILD_NUMBER}/fm-release.log"
@@ -123,7 +149,7 @@ pipeline {
             }
         }
 
-        stage('Check and Checkout SCM') {
+        stage('Обновление репозитория') {
             when {
                 expression { env.MECHEL_RESTORE_MODE == 'restore' }
             }
@@ -155,12 +181,12 @@ pipeline {
                         env.MECHEL_ERP_COMMIT = revision.GIT_COMMIT
                         echo "Ветка ${branch}, commit ${env.MECHEL_ERP_COMMIT}."
                     }
-                    runEnterpriseScript('check', 'Проверить адрес ИБ, платформу 1С и fm_release.epf')
+                    runEnterpriseScript('check', 'Проверка адреса ИБ, платформы 1С, обработки и параметров входа')
                 }
             }
         }
 
-        stage('Создать заявку') {
+        stage('Создание заявки на восстановление базы') {
             when {
                 expression { env.MECHEL_RESTORE_MODE == 'restore' }
             }
@@ -173,7 +199,7 @@ pipeline {
             }
         }
 
-        stage('Дождаться результата') {
+        stage('Восстановление базы') {
             steps {
                 script {
                     runRestoreScript('wait', 'Опросить статус восстановления')
@@ -182,7 +208,21 @@ pipeline {
             }
         }
 
-        stage('Запустить fm_release.epf') {
+        stage('Смена пароля пользователя 1С') {
+            when {
+                expression { env.MECHEL_RESTORE_MODE == 'restore' }
+            }
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+            }
+            steps {
+                script {
+                    runEnterpriseScript('reset', 'Установка нового пароля в восстановленной базе')
+                }
+            }
+        }
+
+        stage('Создание пользователей Аналитик и Разработчик') {
             when {
                 expression { env.MECHEL_RESTORE_MODE == 'restore' }
             }
