@@ -140,37 +140,52 @@ pipeline {
     }
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Ветка ERP для сборки выбранных файлов и получения fm_release.epf. Пусто — develop')
-        booleanParam(name: 'RESTORE_COPY', defaultValue: false, description: 'Восстановить копию источника в приёмник перед выбранными действиями')
-        string(name: 'SOURCE_INFOBASE', defaultValue: '', description: 'Источник для RESTORE_COPY. Имя ИБ или СЕРВЕР:ПОРТ|ИмяИБ')
-        booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'При восстановлении снять актуальную копию источника')
-        string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'Тестовая база, в которой будут выполнены выбранные действия. Формат СЕРВЕР:ПОРТ|ИмяИБ')
-        booleanParam(name: 'CONFIRM_TARGET', defaultValue: false, description: 'Подтверждаю выполнение выбранных действий в TARGET_INFOBASE')
-        booleanParam(name: 'INSTALL_CF', defaultValue: false, description: 'Собрать 1Cv8.cf и установить основную конфигурацию')
-        booleanParam(name: 'INSTALL_MECHEL', defaultValue: true, description: 'Собрать Mechel.cfe, проверить применимость и установить расширение')
-        booleanParam(name: 'SETUP_TOOLKIT', defaultValue: false, description: 'При отсутствии установить Infostart Toolkit и назначить его роль трём пользователям')
-        booleanParam(name: 'RUN_MONOPOLY_UPDATE', defaultValue: false, description: 'Запустить обработчики обновления данных ERP после выбранных установок')
-        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С для выбранных действий и установки пароля при восстановлении')
+        string(name: 'BRANCH_NAME', defaultValue: 'develop',
+               description: 'Ветка ERP, из которой берутся fm_release.epf и исходники для выбранной сборки. Укажите, например, develop или hotfix/2.5.27.107. Пустое поле означает develop.')
+        booleanParam(name: 'RESTORE_COPY', defaultValue: false,
+                     description: 'Включите, чтобы перед подготовкой заменить содержимое TARGET_INFOBASE копией SOURCE_INFOBASE. Для работы с уже существующей базой оставьте флажок снятым.')
+        string(name: 'SOURCE_INFOBASE', defaultValue: '',
+               description: 'Источник данных при RESTORE_COPY. Например, UKM-SAPP150:1541|ERP_KGOK. Однозначное имя ERP_KGOK тоже допустимо. Для подготовки без восстановления оставьте поле пустым.')
+        booleanParam(name: 'DIFF_COPY', defaultValue: false,
+                     description: 'При включённом RESTORE_COPY запросить свежую копию SOURCE_INFOBASE на момент выполнения заявки. С продуктивной базы оркестратор снимет временную дифференциальную копию, с других источников полную. При снятом DIFF_COPY используется уже доступная копия.')
+        string(name: 'TARGET_INFOBASE', defaultValue: '',
+               description: 'Тестовая база, в которой выполняются выбранные действия. При RESTORE_COPY её содержимое будет заменено. Укажите полный адрес, например UKM-SAPP145:6541|ERP_DEV_NAGAYTSEV.')
+        booleanParam(name: 'CONFIRM_TARGET', defaultValue: false,
+                     description: 'Обязательно при RESTORE_COPY. Сверьте SOURCE_INFOBASE и TARGET_INFOBASE и отметьте флажок, чтобы подтвердить замену содержимого тестовой базы.')
+        booleanParam(name: 'INSTALL_CF', defaultValue: true,
+                     description: 'Собрать 1Cv8.cf из выбранной ветки и обновить основную конфигурацию TARGET_INFOBASE. Снимите, если нужна только установка расширения Mechel.')
+        booleanParam(name: 'INSTALL_MECHEL', defaultValue: true,
+                     description: 'Собрать Mechel.cfe из выбранной ветки, загрузить расширение и применить его после проверки. Снимите, если нужно установить только 1Cv8.cf.')
+        booleanParam(name: 'SETUP_TOOLKIT', defaultValue: true,
+                     description: 'Установить Infostart Toolkit при его отсутствии и назначить роль «Полные права» Toolkit пользователям DataExchange, Разработчик и Аналитик. Уже установленная версия используется повторно.')
+        booleanParam(name: 'RUN_MONOPOLY_UPDATE', defaultValue: true,
+                     description: 'После выбранных установок запустить в 1С:Предприятии штатное монопольное обновление данных ERP. Например, включите после установки CF и Mechel. Снимите, если хотите выполнить обновление отдельно.')
+        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange',
+               description: 'Имя пользователя внутри TARGET_INFOBASE с правами на выбранные операции. Например, DataExchange. При RESTORE_COPY оркестратор установит пароль этому пользователю.')
         credentials(
             name: 'ENTERPRISE_PASSWORD',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
             defaultValue: 'erp-dataexchange-password',
             required: false,
-            description: 'Secret Text для ENTERPRISE_USER. Без восстановления выберите действующий пароль'
+            description: 'Выберите Jenkins Secret Text с паролем ENTERPRISE_USER, например erp-dataexchange-password. При RESTORE_COPY этот пароль устанавливается оркестратором. Для существующей базы нужен действующий пароль. В режиме wait поле не требуется.'
         )
-        booleanParam(name: 'VERBOSE_LOG', defaultValue: false, description: 'Вывести подробный лог Mechel (DEBUG)')
+        booleanParam(name: 'VERBOSE_LOG', defaultValue: false,
+                     description: 'Включите для диагностики сборки и запуска 1С, чтобы видеть подробные сообщения Mechel уровня DEBUG. Для обычного прогона достаточно INFO.')
         credentials(
             name: 'TOKEN',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
             defaultValue: 'erp-restore-api-token',
             required: true,
-            description: 'Secret Text с токеном оркестратора'
+            description: 'Выберите Jenkins Secret Text с токеном оркестратора. Например, erp-restore-api-token. Он нужен для восстановления, опроса заявки и управления блокировкой тестовой базы.'
         )
-        string(name: 'LABEL', defaultValue: 'erp_nightly', description: 'Windows-агент Jenkins')
+        string(name: 'LABEL', defaultValue: 'erp_nightly',
+               description: 'Метка Windows-агента Jenkins с установленными OneScript и 1С. Например, erp_nightly. С той же меткой и на том же агенте переиспользуется существующий клон ERP.')
         choice(name: 'RESTORE_MODE', choices: ['prepare', 'wait'],
-               description: 'prepare — выбранные действия, wait — только опрос существующей заявки')
-        string(name: 'RESTORE_GUID', defaultValue: '', description: 'GUID ранее созданной заявки для режима wait')
-        string(name: 'WAIT_TIMEOUT_MINUTES', defaultValue: '120', description: 'Максимальное время опроса в минутах')
+               description: 'Выберите prepare для подготовки базы с выбранными флажками. Выберите wait, чтобы только дождаться результата уже созданной заявки по RESTORE_GUID.')
+        string(name: 'RESTORE_GUID', defaultValue: '',
+               description: 'Только для wait. Скопируйте GUID из журнала предыдущего запуска или файла restore-guid.txt. Пример формата 11111111-2222-4333-8444-555555555555. Для prepare оставьте пустым.')
+        string(name: 'WAIT_TIMEOUT_MINUTES', defaultValue: '120',
+               description: 'Сколько минут Jenkins ждёт результата при RESTORE_COPY или в режиме wait. Укажите целое положительное число, например 120.')
     }
 
     environment {
@@ -227,16 +242,19 @@ pipeline {
                         error('Для подготовки базы выберите prepare и оставьте RESTORE_GUID пустым.')
                     }
 
-                    def installCF = params.INSTALL_CF == true
+                    def installCF = params.INSTALL_CF != false
                     def installMechel = params.INSTALL_MECHEL != false
-                    def setupToolkit = params.SETUP_TOOLKIT == true
-                    def update = params.RUN_MONOPOLY_UPDATE == true
+                    def setupToolkit = params.SETUP_TOOLKIT != false
+                    def update = params.RUN_MONOPOLY_UPDATE != false
                     def build = installCF || installMechel
                     def target = params.TARGET_INFOBASE?.trim()
                     def branch = params.BRANCH_NAME?.trim() ?: 'develop'
                     def enterpriseUser = params.ENTERPRISE_USER?.trim()
-                    if (!target || !params.CONFIRM_TARGET) {
-                        error('Укажите TARGET_INFOBASE, сверьте адрес и отметьте CONFIRM_TARGET.')
+                    if (!target) {
+                        error('Укажите полный адрес тестовой базы в TARGET_INFOBASE.')
+                    }
+                    if (restoreCopy && !params.CONFIRM_TARGET) {
+                        error('При RESTORE_COPY сверьте SOURCE_INFOBASE и TARGET_INFOBASE и отметьте CONFIRM_TARGET.')
                     }
                     if (!isBranchNameValid(branch)) {
                         error('Укажите корректное имя ветки в BRANCH_NAME, например hotfix/2.5.27.107.')
@@ -269,10 +287,15 @@ pipeline {
                             error('Укажите разные SOURCE_INFOBASE и TARGET_INFOBASE.')
                         }
                         env.MECHEL_RESTORE_SOURCE = source
-                        env.MECHEL_RESTORE_MAKE_COPY = params.MAKE_COPY ? '1' : '0'
+                        def freshCopy = params.DIFF_COPY == true
+                        env.MECHEL_RESTORE_MAKE_COPY = freshCopy ? '1' : '0'
                         env.MECHEL_RESTORE_GUID_FILE = "${env.MECHEL_RUN_DIR}/restore-guid.txt"
                         currentBuild.description = "${source} → ${target}"
                         runRestoreScript('check', 'Проверка источника и защиты базы-приёмника')
+                        echo(freshCopy ? 'Для восстановления будет запрошена свежая копия источника.' :
+                                         'Для восстановления используется доступная копия источника.')
+                    } else {
+                        echo "Подготовка существующей базы ${target} без восстановления."
                     }
                     runEnterpriseScript('check-login', 'Проверить адрес базы, клиент 1С и параметры входа')
                 }
@@ -384,7 +407,7 @@ pipeline {
 
                 stage('Установка основной конфигурации') {
                     when {
-                        expression { params.INSTALL_CF == true }
+                        expression { env.MECHEL_BUILD_SELECTION in ['cf', 'both'] }
                     }
                     steps {
                         script {
@@ -395,7 +418,7 @@ pipeline {
 
                 stage('Установка расширения Mechel') {
                     when {
-                        expression { params.INSTALL_MECHEL != false }
+                        expression { env.MECHEL_BUILD_SELECTION in ['cfe', 'both'] }
                     }
                     steps {
                         script {
@@ -408,7 +431,7 @@ pipeline {
 
                 stage('Установка Infostart Toolkit') {
                     when {
-                        expression { params.SETUP_TOOLKIT }
+                        expression { params.SETUP_TOOLKIT != false }
                     }
                     steps {
                         script {
@@ -419,7 +442,7 @@ pipeline {
 
                 stage('Монопольное обновление ERP') {
                     when {
-                        expression { params.RUN_MONOPOLY_UPDATE }
+                        expression { params.RUN_MONOPOLY_UPDATE != false }
                     }
                     steps {
                         script {
@@ -430,7 +453,7 @@ pipeline {
 
                 stage('Права Infostart Toolkit') {
                     when {
-                        expression { params.SETUP_TOOLKIT }
+                        expression { params.SETUP_TOOLKIT != false }
                     }
                     steps {
                         script {
