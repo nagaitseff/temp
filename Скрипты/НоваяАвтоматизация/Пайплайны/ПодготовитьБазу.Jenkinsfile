@@ -25,12 +25,19 @@ chcp 65001 >nul
 def runEnterpriseScript(String action, String title) {
     def logPath = pwd() + '/' + env.MECHEL_FIRST_START_LOG
     withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_ENTERPRISE_LOG=' + logPath]) {
-        withCredentials([string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD')]) {
+        def run = {
             dir(env.MECHEL_ERP_DIR) {
                 bat label: title, encoding: 'UTF-8', script: '''@echo off
 chcp 65001 >nul
 "%MECHEL_OSCRIPT%" -encoding=utf-8 "%MECHEL_ENTERPRISE_SCRIPT%" "%MECHEL_ENTERPRISE_ACTION%"
 '''
+            }
+        }
+        if (action == 'cleanup') {
+            run()
+        } else {
+            withCredentials([string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD')]) {
+                run()
             }
         }
     }
@@ -230,6 +237,11 @@ pipeline {
             post {
                 unsuccessful {
                     echo 'Восстановление завершено. Проверьте запуск 1С:Предприятия и лог fm-release.log.'
+                }
+                cleanup {
+                    script {
+                        runEnterpriseScript('cleanup', 'Удаление временных файлов запуска 1С')
+                    }
                 }
             }
         }
