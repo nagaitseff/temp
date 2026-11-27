@@ -1,5 +1,7 @@
 def runRestoreScript(String action, String title) {
-    withEnv(['MECHEL_RESTORE_ACTION=' + action, 'MECHEL_RESTORE_USER=', 'MECHEL_RESTORE_OSNAME=']) {
+    def restoreUser = action == 'create' ? env.MECHEL_ENTERPRISE_USER : ''
+    withEnv(['MECHEL_RESTORE_ACTION=' + action, 'MECHEL_RESTORE_USER=' + restoreUser,
+             'MECHEL_RESTORE_OSNAME=', 'MECHEL_ENTERPRISE_PASSWORD=']) {
         def run = {
             bat label: title, encoding: 'UTF-8', script: '''@echo off
 chcp 65001 >nul
@@ -9,7 +11,11 @@ chcp 65001 >nul
         if (action == 'check') {
             run()
         } else {
-            withCredentials([string(credentialsId: params.TOKEN, variable: 'MECHEL_API_TOKEN')]) {
+            def bindings = [string(credentialsId: params.TOKEN, variable: 'MECHEL_API_TOKEN')]
+            if (env.MECHEL_RESTORE_MODE == 'restore') {
+                bindings.add(string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD'))
+            }
+            withCredentials(bindings) {
                 run()
             }
         }
@@ -18,12 +24,8 @@ chcp 65001 >nul
 
 def runEnterpriseScript(String action, String title) {
     def logPath = pwd() + '/' + env.MECHEL_FIRST_START_LOG
-    def bindings = [string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD')]
-    if (action != 'run' && env.MECHEL_PASSWORD_CHANGE == 'com') {
-        bindings.add(string(credentialsId: params.ENTERPRISE_CURRENT_PASSWORD, variable: 'MECHEL_ENTERPRISE_CURRENT_PASSWORD'))
-    }
-    withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_ENTERPRISE_LOG=' + logPath, 'MECHEL_ENTERPRISE_CURRENT_PASSWORD=']) {
-        withCredentials(bindings) {
+    withEnv(['MECHEL_ENTERPRISE_ACTION=' + action, 'MECHEL_ENTERPRISE_LOG=' + logPath]) {
+        withCredentials([string(credentialsId: params.ENTERPRISE_PASSWORD, variable: 'MECHEL_ENTERPRISE_PASSWORD')]) {
             dir(env.MECHEL_ERP_DIR) {
                 bat label: title, encoding: 'UTF-8', script: '''@echo off
 chcp 65001 >nul
@@ -57,16 +59,7 @@ pipeline {
         booleanParam(name: 'MAKE_COPY', defaultValue: false, description: 'Снять актуальную копию источника. Без флажка используется доступная копия')
         string(name: 'TARGET_INFOBASE', defaultValue: '', description: 'ВНИМАНИЕ. Содержимое этой базы будет заменено. Формат СЕРВЕР:ПОРТ|ИмяИБ')
         booleanParam(name: 'CONFIRM_TARGET', defaultValue: false, description: 'Проверили источник и приёмник? Подтверждаю замену содержимого TARGET_INFOBASE')
-        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С с правами администратора для смены пароля и запуска обработки')
-        choice(name: 'PASSWORD_CHANGE', choices: ['com', 'configurator'],
-               description: 'com — автоматически через COM. configurator — вручную в Конфигураторе с подтверждением в Jenkins')
-        credentials(
-            name: 'ENTERPRISE_CURRENT_PASSWORD',
-            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
-            defaultValue: 'erp-dataexchange-current-password',
-            required: false,
-            description: 'Secret Text с текущим паролем ENTERPRISE_USER из копии источника. Нужен для автоматической смены'
-        )
+        string(name: 'ENTERPRISE_USER', defaultValue: 'DataExchange', description: 'Пользователь 1С для запуска обработки. Оркестратор установит ему пароль при восстановлении')
         credentials(
             name: 'ENTERPRISE_PASSWORD',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
@@ -132,21 +125,14 @@ pipeline {
                         def target = params.TARGET_INFOBASE?.trim()
                         def branch = params.BRANCH_NAME?.trim() ?: 'develop'
                         def enterpriseUser = params.ENTERPRISE_USER?.trim()
-                        def passwordChange = params.PASSWORD_CHANGE ?: 'com'
                         if (!source || !target || source.equalsIgnoreCase(target)) {
                             error('Укажите разные SOURCE_INFOBASE и TARGET_INFOBASE.')
                         }
                         if (!isBranchNameValid(branch)) {
                             error('Укажите корректное имя ветки в BRANCH_NAME, например hotfix/2.5.27.107.')
                         }
-                        if (!(passwordChange in ['com', 'configurator'])) {
-                            error('Выберите com или configurator в PASSWORD_CHANGE.')
-                        }
                         if (!enterpriseUser || !params.ENTERPRISE_PASSWORD) {
                             error('Укажите ENTERPRISE_USER и выберите Secret Text в ENTERPRISE_PASSWORD.')
-                        }
-                        if (passwordChange == 'com' && !params.ENTERPRISE_CURRENT_PASSWORD) {
-                            error('Для автоматической смены выберите Secret Text в ENTERPRISE_CURRENT_PASSWORD.')
                         }
                         if (!fileExists(env.MECHEL_ENTERPRISE_SCRIPT)) {
                             error('Скопируйте ЗапуститьОбработкуИБ.os в C:\\OneScript_2\\api на агенте.')
@@ -159,7 +145,6 @@ pipeline {
                         }
                         env.MECHEL_RESTORE_MAKE_COPY = params.MAKE_COPY ? '1' : '0'
                         env.MECHEL_ENTERPRISE_USER = enterpriseUser
-                        env.MECHEL_PASSWORD_CHANGE = passwordChange
                         env.MECHEL_ERP_BRANCH = branch
                         env.MECHEL_RESTORE_GUID_FILE = "mechel-restore/${env.BUILD_NUMBER}/restore-guid.txt"
                         env.MECHEL_FIRST_START_LOG = "mechel-restore/${env.BUILD_NUMBER}/fm-release.log"
@@ -226,27 +211,6 @@ pipeline {
                 script {
                     runRestoreScript('wait', 'Опросить статус восстановления')
                     env.MECHEL_RESTORE_COMPLETE = '1'
-                }
-            }
-        }
-
-        stage('Смена пароля пользователя 1С') {
-            when {
-                expression { env.MECHEL_RESTORE_MODE == 'restore' }
-            }
-            options {
-                timeout(time: 30, unit: 'MINUTES')
-            }
-            steps {
-                script {
-                    if (env.MECHEL_PASSWORD_CHANGE == 'configurator') {
-                        input(
-                            message: "Откройте Конфигуратор базы ${env.MECHEL_RESTORE_TARGET}. Установите пользователю ${env.MECHEL_ENTERPRISE_USER} пароль из выбранного ENTERPRISE_PASSWORD и закройте Конфигуратор.",
-                            ok: 'Пароль изменён'
-                        )
-                    } else {
-                        runEnterpriseScript('reset', 'Установка нового пароля в восстановленной базе')
-                    }
                 }
             }
         }

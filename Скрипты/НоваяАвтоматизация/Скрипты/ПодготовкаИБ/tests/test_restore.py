@@ -14,7 +14,9 @@ from urllib.parse import parse_qs, quote, urlsplit
 
 GUID = "61a78036-5acb-4281-b0c1-4d70b8a6bc6b"
 FAILED_GUID = "75ad092f-15de-4928-a646-abe9d9fd1ea0"
+STATUS_ERROR_GUID = "493919e3-8aa5-4e45-b6dc-c31ed279e38a"
 TOKEN = "local+restore/token&?"
+PASSWORD = 'fixture+Pass9/"секрет'
 SOURCE = "Кластер:6541|Источник"
 TARGET = "Кластер:6541|Приёмник с пробелом"
 
@@ -42,7 +44,7 @@ def main():
             data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             calls.append(("POST", self.path, data))
             if data["targetinfobase"] == "Отклонённая ИБ":
-                self.reply("00.04", "", "Заявка отклонена тестовым API")
+                self.reply("00.04", "", "Заявка отклонена тестовым API " + data["password"])
             else:
                 self.reply("00.00", GUID)
 
@@ -50,7 +52,10 @@ def main():
             request = urlsplit(self.path)
             params = parse_qs(request.query)
             calls.append(("GET", request.path, params))
-            self.reply("00.00", -1 if params["guid"] == [FAILED_GUID] else 0)
+            if params["guid"] == [STATUS_ERROR_GUID]:
+                self.reply("14.03", "", "Ошибка смены пароля " + PASSWORD)
+            else:
+                self.reply("00.00", -1 if params["guid"] == [FAILED_GUID] else 0)
 
     here = Path(__file__).resolve().parent
     library = here.parents[2] / "Библиотека" / "mechel"
@@ -75,6 +80,7 @@ def main():
                 "MECHEL_RESTORE_MAKE_COPY": "0",
                 "MECHEL_RESTORE_USER": "",
                 "MECHEL_RESTORE_OSNAME": "",
+                "MECHEL_ENTERPRISE_PASSWORD": "",
                 "MECHEL_RESTORE_GUID": "",
                 "MECHEL_RESTORE_GUID_FILE": "mechel-restore/42/restore-guid.txt",
                 "MECHEL_RESTORE_WAIT_MINUTES": "120",
@@ -89,7 +95,8 @@ def main():
                     encoding="utf-8", errors="replace", timeout=20,
                 )
                 output = completed.stdout + completed.stderr
-                assert TOKEN not in output and quote(TOKEN, safe="") not in output
+                for secret in (TOKEN, PASSWORD):
+                    assert secret not in output and quote(secret, safe="") not in output
                 assert (completed.returncode == 0) == success, output
                 assert expected_message in output, output
                 return output
@@ -112,6 +119,8 @@ def main():
                 run("create", "уже была попытка отправки", success=False)
                 run("create", "GUID уже задан", success=False, MECHEL_RESTORE_GUID=guid)
                 run("wait", "с ошибкой", success=False, MECHEL_RESTORE_GUID=FAILED_GUID)
+                run("wait", "Ошибка смены пароля ***", success=False, MECHEL_RESTORE_GUID=STATUS_ERROR_GUID,
+                    MECHEL_ENTERPRISE_PASSWORD=PASSWORD)
                 run("wait", "положительным целым числом", success=False,
                     MECHEL_RESTORE_GUID=guid, MECHEL_RESTORE_WAIT_MINUTES="0")
 
@@ -119,9 +128,13 @@ def main():
                     MECHEL_RESTORE_MAKE_COPY="1", MECHEL_RESTORE_USER="Аналитик",
                     MECHEL_RESTORE_OSNAME=r"DOMAIN\analyst", MECHEL_RESTORE_GUID_FILE="real/restore-guid.txt")
 
+                auth = {"MECHEL_RESTORE_MODE": "restore", "MECHEL_RESTORE_USER": "DataExchange",
+                        "MECHEL_ENTERPRISE_PASSWORD": PASSWORD}
+                run("create", "Оркестратор установит пароль для DataExchange",
+                    MECHEL_RESTORE_GUID_FILE="auth/restore-guid.txt", **auth)
                 rejected = {"MECHEL_RESTORE_TARGET": "Отклонённая ИБ",
-                            "MECHEL_RESTORE_GUID_FILE": "rejected/restore-guid.txt"}
-                run("create", "Заявка отклонена тестовым API", success=False, **rejected)
+                            "MECHEL_RESTORE_GUID_FILE": "rejected/restore-guid.txt", **auth}
+                run("create", "Заявка отклонена тестовым API ***", success=False, **rejected)
                 assert (agent / "rejected/restore-guid.txt.pending").is_file()
                 assert not (agent / "rejected/restore-guid.txt").exists()
                 run("create", "уже была попытка отправки", success=False, **rejected)
@@ -130,6 +143,8 @@ def main():
                     MECHEL_RESTORE_TARGET=SOURCE.lower(), MECHEL_RESTORE_GUID_FILE="invalid/restore-guid.txt")
                 run("create", "укажите MECHEL_RESTORE_USER", success=False,
                     MECHEL_RESTORE_OSNAME=r"DOMAIN\analyst", MECHEL_RESTORE_GUID_FILE="invalid/restore-guid.txt")
+                run("create", "укажите MECHEL_RESTORE_USER", success=False,
+                    MECHEL_ENTERPRISE_PASSWORD=PASSWORD, MECHEL_RESTORE_GUID_FILE="invalid/restore-guid.txt")
                 run("create", "MECHEL_API_TOKEN", success=False, MECHEL_API_TOKEN="")
             finally:
                 server.shutdown()
@@ -141,14 +156,17 @@ def main():
         ("POST", "/hs/loading1c/new", default),
         ("GET", "/hs/loading1c/status", {"guid": [GUID], "token": [TOKEN]}),
         ("GET", "/hs/loading1c/status", {"guid": [FAILED_GUID], "token": [TOKEN]}),
+        ("GET", "/hs/loading1c/status", {"guid": [STATUS_ERROR_GUID], "token": [TOKEN]}),
         ("POST", "/hs/loading1c/new",
          {**default, "test": 0, "makecopy": True, "user": "Аналитик", "osname": r"DOMAIN\analyst"}),
-        ("POST", "/hs/loading1c/new", {**default, "targetinfobase": "Отклонённая ИБ"}),
+        ("POST", "/hs/loading1c/new", {**default, "test": 0, "user": "DataExchange", "password": PASSWORD}),
+        ("POST", "/hs/loading1c/new",
+         {**default, "test": 0, "user": "DataExchange", "password": PASSWORD, "targetinfobase": "Отклонённая ИБ"}),
     ], "Unexpected request order or payload"
     for method, _, data in calls:
         if method == "POST":
             assert type(data["test"]) is int and type(data["makecopy"]) is bool
-    print("PASS: protected receivers, test/restore payloads, wait-only mode, GUID file, failure and repeat protection")
+    print("PASS: restoration payloads and password masking, protection of receivers, wait-only and repeat protection")
 
 
 if __name__ == "__main__":
