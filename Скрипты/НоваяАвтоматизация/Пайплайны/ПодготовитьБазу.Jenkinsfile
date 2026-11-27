@@ -78,20 +78,6 @@ def runDesignerStep(String action, String title, String logFile) {
 def updateErpCheckout() {
     def branch = env.MECHEL_ERP_BRANCH
     def remoteRef = 'refs/remotes/origin/' + branch
-    def previousGit = pwd() + '\\erp-source\\.git'
-    if (fileExists(previousGit + '\\HEAD') && !fileExists(env.MECHEL_ERP_DIR + '/.git')) {
-        withEnv(['MECHEL_GIT_SEED=' + previousGit, 'MECHEL_GIT_CACHE=' + env.MECHEL_ERP_DIR.replace('/', '\\')]) {
-            bat label: 'Переиспользовать Git-объекты из прежнего клона', encoding: 'UTF-8', script: '''@echo off
-chcp 65001 >nul
-robocopy "%MECHEL_GIT_SEED%" "%MECHEL_GIT_CACHE%\\.git-seed" /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP
-if errorlevel 8 exit /b 1
-if not exist "%MECHEL_GIT_CACHE%\\.git-seed\\HEAD" exit /b 1
-attrib -h -s "%MECHEL_GIT_CACHE%\\.git-seed"
-if errorlevel 1 exit /b 1
-ren "%MECHEL_GIT_CACHE%\\.git-seed" ".git"
-'''
-        }
-    }
     dir(env.MECHEL_ERP_DIR) {
         def operation = fileExists('.git') ? 'Обновление сохранённого клона' : 'Первичное получение репозитория'
         echo "${operation}. Ветка ${branch}, каталог ${pwd()}."
@@ -174,6 +160,7 @@ pipeline {
         MECHEL_1C_EXE = 'C:\\Program Files\\1cv8\\8.3.27.2342\\bin\\1cv8.exe'
         MECHEL_IBCMD_EXE = 'C:\\Program Files\\1cv8\\8.3.27.2342\\bin\\ibcmd.exe'
         MECHEL_EPF_FILE = 'tools/OS/fm_release.epf'
+        MECHEL_ERP_DIR = 'erp-source'
         MECHEL_SESSION_PERMISSION_CODE = '789789789'
         GIT_CREDENTIALS_ID = 'JenkinsReader'
     }
@@ -238,10 +225,6 @@ pipeline {
                         env.MECHEL_RESTORE_MAKE_COPY = params.MAKE_COPY ? '1' : '0'
                         env.MECHEL_ENTERPRISE_USER = enterpriseUser
                         env.MECHEL_ERP_BRANCH = branch
-                        def workspacePath = pwd().replace('\\', '/')
-                        def separator = workspacePath.lastIndexOf('/')
-                        env.MECHEL_ERP_DIR = workspacePath.substring(0, separator) + '/.mechel-erp/' +
-                            workspacePath.substring(separator + 1)
                         env.MECHEL_BUILD_CONFIGURATION = requestedBranch ? '1' : '0'
                         env.MECHEL_RUN_DIR = "mechel-restore/${env.BUILD_NUMBER}"
                         env.MECHEL_RESTORE_GUID_FILE = "${env.MECHEL_RUN_DIR}/restore-guid.txt"
