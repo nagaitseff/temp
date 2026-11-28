@@ -1,0 +1,52 @@
+2026-11-27T17:19:20 [INFO] [СобратьКонфигурациюИБ] Сборка 1Cv8.cf и Mechel.cfe. Коммит 5cd561b4beee5ad9765102e8df3b9adbecec7af6
+2026-11-27T17:19:20 [DEBUG] [СобратьКонфигурациюИБ] Временный каталог C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E
+2026-11-27T17:19:20 [INFO] [СобратьКонфигурациюИБ] Создание файловой базы для 1Cv8.cf
+2026-11-27T17:19:20 [DEBUG] [СобратьКонфигурациюИБ] ibcmd create --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\db"
+2026-11-27T17:19:23 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание информационной базы...
+2026-11-27T17:19:23 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание информационной базы успешно завершено
+2026-11-27T17:19:23 [INFO] [СобратьКонфигурациюИБ] Импорт XML из C:\Jenkins\workspace\test_erp\erp-source\src\cf
+2026-11-27T17:19:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd config import --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\db" "C:\Jenkins\workspace\test_erp\erp-source\src\cf"
+2026-11-27T17:19:27 [INFO] [СобратьКонфигурациюИБ] [INFO] Импорт конфигурации из XML...
+2026-11-27T17:19:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:20:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:20:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:21:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:21:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:22:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:22:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:23:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:23:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:24:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:24:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:25:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:25:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:26:23 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:26:53 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 176772
+2026-11-27T17:27:04 [INFO] [СобратьКонфигурациюИБ] [INFO] Импорт конфигурации из XML успешно завершен
+2026-11-27T17:27:06 [INFO] [СобратьКонфигурациюИБ] Выгрузка 1Cv8.cf
+2026-11-27T17:27:06 [DEBUG] [СобратьКонфигурациюИБ] ibcmd config save --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cf\db" "C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\1Cv8.cf"
+2026-11-27T17:27:16 [INFO] [СобратьКонфигурациюИБ] [INFO] Сохранение конфигурации в файл...
+2026-11-27T17:27:36 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 161616
+2026-11-27T17:28:06 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 161616
+2026-11-27T17:28:36 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 161616
+2026-11-27T17:29:06 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 161616
+2026-11-27T17:29:36 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 161616
+2026-11-27T17:29:46 [INFO] [СобратьКонфигурациюИБ] [INFO] Сохранение конфигурации в файл успешно завершено: C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\1Cv8.cf
+2026-11-27T17:29:46 [INFO] [СобратьКонфигурациюИБ] Создание файловой базы для Mechel.cfe
+2026-11-27T17:29:46 [DEBUG] [СобратьКонфигурациюИБ] ibcmd create --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\db"
+2026-11-27T17:29:50 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание информационной базы...
+2026-11-27T17:29:50 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание информационной базы успешно завершено
+2026-11-27T17:29:50 [INFO] [СобратьКонфигурациюИБ] Создание расширения Mechel
+2026-11-27T17:29:50 [DEBUG] [СобратьКонфигурациюИБ] ibcmd config extension create --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\db" --name=Mechel --name-prefix=Mechel
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание расширения: 'Mechel'
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Создание расширения: 'Mechel' успешно завершено
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Создано поколение расширения конфигурации: 121c81cb9adf61ba27a7dc0517fc8cd385a92e97
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Построение индекса справки успешно завершено
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Построение индекса справки...
+2026-11-27T17:29:54 [INFO] [СобратьКонфигурациюИБ] [INFO] Обновление конфигурации базы данных успешно завершено
+2026-11-27T17:29:55 [INFO] [СобратьКонфигурациюИБ] Импорт XML из C:\Jenkins\workspace\test_erp\erp-source\src\cfe\Mechel
+2026-11-27T17:29:55 [DEBUG] [СобратьКонфигурациюИБ] ibcmd config import --data="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\data" --db-path="C:\Users\UKM-Jenkins-User\AppData\Local\Temp\mechel-build-F27494CA637F4A12B2344A2E\cfe\db" --extension=Mechel "C:\Jenkins\workspace\test_erp\erp-source\src\cfe\Mechel"
+2026-11-27T17:29:59 [INFO] [СобратьКонфигурациюИБ] [INFO] Импорт конфигурации из XML...
+2026-11-27T17:30:25 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 175544
+2026-11-27T17:30:55 [DEBUG] [СобратьКонфигурациюИБ] ibcmd продолжает работу, PID 175544
+2026-11-27T17:31:07 [ERROR] [СобратьКонфигурациюИБ] {Модуль C:\OneScript_2\api\СобратьКонфигурациюИБ.os / Ошибка в строке: 59 / Импорт XML из C:\Jenkins\workspace\test_erp\erp-source\src\cfe\Mechel. Код ibcmd: 1}
