@@ -1,0 +1,498 @@
+@groovy.transform.Field
+def BASE_CONFIG = [
+    'ERP_YKUZ_RELEASE_DRAFT' : [
+        server  : 'UKM-SAPP123',
+        port    : '2541',
+        cluster : '123_clust_admin',
+        archive : '\\\\int.mechel.corp\\UKM\\asr_backup\\1C\\ERP_YKUZ.bak',
+        mailGroup: 'draft'
+    ],
+    'ERP_KGOK_RELEASE_DRAFT' : [
+        server  : 'UKM-SAPP123',
+        port    : '8541',
+        cluster : '123_clust_admin',
+        archive : '\\\\int.mechel.corp\\UKM\\asr_backup\\1C\\ERP_KGOK.bak',
+        mailGroup: 'draft'
+    ],
+    'ERP_YU_RELEASE_DRAFT'   : [
+        server  : 'UKM-SAPP123',
+        port    : '7541',
+        cluster : '123_clust_admin',
+        archive : '\\\\int.mechel.corp\\UKM\\asr_backup\\1C\\ERP_YU.bak',
+        mailGroup: 'draft'
+    ],
+    'ERP_MOD_KNIGA_EN_2'  : [
+        server  : 'UKM-SAPP24',
+        port    : '2541',
+        cluster : '24_clust_admin',
+        archive : '',
+        mailGroup: 'kniga'
+    ]
+]
+
+def SHOULD_UPDATE = false
+
+def getMailRecipients(String groupName) {
+    def mailCfg = readJSON file: 'mailing-list.json', returnPojo: true
+
+    if (!mailCfg.containsKey(groupName)) {
+        error "Группа '${groupName}' не найдена в mailing-list.json"
+    }
+
+    return mailCfg[groupName].join(',')
+}
+
+def sendEmailNotification(String title, String bodyHtml, boolean attachLog) {
+    def cfg = BASE_CONFIG[params.BASE_NAME]
+    def groupName = cfg?.mailGroup ?: 'draft'
+
+    def recipients = getMailRecipients(groupName)
+
+    emailext(
+        subject: "${title} ${params.BASE_NAME}",
+        body: bodyHtml,
+        mimeType: 'text/html',
+        from: 'jenkins@mechel.com',
+        to: recipients,
+        attachLog: attachLog
+    )
+}
+
+pipeline {
+
+    parameters {
+        string(
+            name: 'INFO',
+            defaultValue: '',
+            description: 'Дополнительная информация для сообщения сборки. Не выводится если отключена отправка сообщения.'
+        )
+        string(
+            name: 'CHECK_TIME',
+            defaultValue: '"24 hours ago"',
+            description: 'Установка времени, для формирования сообщения в телеграм. Формат времени GIT. По-умолчанию последние 24 часа.'
+        )
+        string(
+            name: 'TOOLS_SOURCE_JOB',
+            defaultValue: '',
+            description: 'Job, из артефактов которого нужно получить tools. Пустое значение — использовать tools из текущего workspace.'
+        )
+        string(
+            name: 'TOOLS_SOURCE_BUILD',
+            defaultValue: '',
+            description: 'Номер сборки job-источника каталога tools.'
+        )
+        string(
+            name: 'LABEL',
+            defaultValue: 'erp_325',
+            description: 'Введите имя ноды для сборки проекта. Ноды проекта ЕРП (erp, erp_325)'
+        )
+        choice(
+            name: 'BASE_NAME',
+            choices: ['none', 'ERP_YKUZ_RELEASE_DRAFT', 'ERP_KGOK_RELEASE_DRAFT', 'ERP_YU_RELEASE_DRAFT', 'ERP_MOD_KNIGA_EN_2'],
+            description: 'Выберите базу данных для обработки'
+        )
+        booleanParam(
+            name: 'NEED_BLOCK',
+            defaultValue: true,
+            description: 'Требуется: Блокировка. Разблокировка будет выполнена автоматически.'
+        )
+        booleanParam(
+            name: 'NEED_BACKUP',
+            defaultValue: true,
+            description: 'Требуется: Сохранение архива перед сборкой.'
+        )
+        string(
+            name: 'EXT_NAME',
+            defaultValue: 'Mechel',
+            description: 'Имя расширения. По-умолчанию "Mechel".'
+        )
+        booleanParam(
+            name: 'LOAD_CF',
+            defaultValue: false,
+            description: 'Загрузка ранее созданного файла'
+        )
+        booleanParam(
+            name: 'LOAD_EXT',
+            defaultValue: false,
+            description: 'Загрузка ранее созданного расширения'
+        )
+        booleanParam(
+            name: 'START_UPDATE',
+            defaultValue: true,
+            description: 'Запустить базу с монопольным обновлением'
+        )
+        booleanParam(
+            name: 'NEED_FIRST_MAINTENCE',
+            defaultValue: false,
+            description: 'Первоначальные настройки базы, создание пользователей Разработчик/Аналитик'
+        )
+        booleanParam(
+            name: 'ENABLE_LOG',
+            defaultValue: false,
+            description: 'Включить отладочные сообщения в лог Jenkins?'
+        )
+        booleanParam(
+            name: 'SEND_MESSAGE',
+            defaultValue: false,
+            description: 'Послать сообщение со списком работ'
+        )
+    }
+
+    agent { label params.LABEL }
+
+    environment {
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+
+        OSCRIPT_PATH = 'C:\\OneScript_2\\bin\\oscript.exe'
+
+        SCRIPT_LOCK = '.\\tools\\OS\\LockUnlockBase.os'
+        SCRIPT_BACKUP = '.\\tools\\OS\\BackupBase.os'
+        SCRIPT_LOAD_CF = '.\\tools\\OS\\LoadCf.os'
+        SCRIPT_LOAD_EXT = '.\\tools\\OS\\LoadExtension.os'
+        SCRIPT_START_AND_UPDATE = '.\\tools\\OS\\StartAndUpdate.os'
+        SCRIPT_FIRST_START = '.\\tools\\OS\\FirstMaintence.os'
+        SCRIPT_SEND_MESSAGE = '.\\tools\\OS\\SendMessageFromFile.os'
+        SCRIPT_GET_COMMITS = '.\\lib\\get_commits_release_draft.sh'
+        SCRIPT_CLEAN = '.\\tools\\OS\\CleanTemp.os'
+
+        COMMAND_LOCK = 'lock'
+        COMMAND_UNLOCK = 'unlock'
+        RELEASE_NUMBER = 'develop'
+        DIR_NAME = 'develop'
+        NAME_FM_FILE = 'fm_release_draft'
+        LOCK_FILE = "base_${params.BASE_NAME}.lock"
+        REPO_PATH = "."
+        UNBLOCK_REG = 'true'
+
+        GIT_CREDENTIALS_ID = 'ee260d51-5e0a-4d3a-abcf-dc10ac1c0f4d'
+    }
+
+    stages {
+        stage('Debug Info') {
+            steps {
+                script {
+                    echo "[${params.BASE_NAME}] Build #${env.BUILD_NUMBER}, node=${env.NODE_NAME}, workspace=${env.WORKSPACE}"
+                    echo "[${params.BASE_NAME}] Params: LABEL=${params.LABEL}, LOAD_CF=${params.LOAD_CF}, LOAD_EXT=${params.LOAD_EXT}, START_UPDATE=${params.START_UPDATE}, SEND_MESSAGE=${params.SEND_MESSAGE}, ENABLE_LOG=${params.ENABLE_LOG}"
+                    echo "[${params.BASE_NAME}] NEED_BLOCK=${params.NEED_BLOCK}, NEED_FIRST_MAINTENCE=${params.NEED_FIRST_MAINTENCE}, EXT_NAME=${params.EXT_NAME}"
+                }
+            }
+        }
+
+        stage('Copy tools from artifacts') {
+            steps {
+                script {
+                    def sourceJob = params.TOOLS_SOURCE_JOB.trim()
+                    def sourceBuild = params.TOOLS_SOURCE_BUILD.trim()
+
+                    if (!sourceJob && !sourceBuild) {
+                        echo "[${params.BASE_NAME}] Источник tools не задан. Используем каталог из текущего workspace."
+                    } else {
+                        if (!sourceJob || !sourceBuild) {
+                            error('Нужно указать оба параметра: TOOLS_SOURCE_JOB и TOOLS_SOURCE_BUILD.')
+                        }
+
+                        if (!(sourceBuild ==~ /\d+/)) {
+                            error("Некорректный номер сборки: ${sourceBuild}")
+                        }
+
+                        // Не смешиваем полученные файлы со старым каталогом.
+                        dir('tools') {
+                            deleteDir()
+                        }
+
+                        copyArtifacts(
+                            projectName: sourceJob,
+                            selector: specific(sourceBuild),
+                            filter: 'tools/**',
+                            flatten: false
+                        )
+
+                        echo "[${params.BASE_NAME}] tools получен из ${sourceJob}, сборка #${sourceBuild}"
+                    }
+
+                    // Проверяем основные скрипты до блокировки базы.
+                    [
+                        env.SCRIPT_LOCK,
+                        env.SCRIPT_LOAD_CF,
+                        env.SCRIPT_LOAD_EXT,
+                        env.SCRIPT_START_AND_UPDATE,
+                        env.SCRIPT_CLEAN
+                    ].each { scriptPath ->
+                        if (!fileExists(scriptPath)) {
+                            error("Не найден обязательный скрипт: ${scriptPath}")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                script {
+                    if (params.BASE_NAME == 'none') {
+                        error("[${params.BASE_NAME}] Значение BASE_NAME не должно быть 'none'. Проваливаю сборку!")
+                    }
+
+                    try {
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\mailing-list.json" "%WORKSPACE%\\" /Y
+                        '''
+                        bat '''
+                            xcopy "\\\\ukm-sapp108\\ERP_Project\\ConstantsForJobs.json" "%WORKSPACE%\\" /Y
+                        '''
+                        echo "[${params.BASE_NAME}] Файлы mailing-list.json и ConstantsForJobs.json подготовлены"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка подготовки файлов, база ${params.BASE_NAME}: ${e.getMessage()}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Setup Environment Variables') {
+            steps {
+                script {
+                    def cfg = BASE_CONFIG[params.BASE_NAME]
+                    if (!cfg) {
+                        error("[${params.BASE_NAME}] Нет настроек для базы '${params.BASE_NAME}' в BASE_CONFIG")
+                    }
+
+                    env.ARCHIVE_PATH = cfg.archive
+                    env.PORT         = cfg.port
+                    env.SERVER_NAME  = cfg.server
+                    env.CLUSTER_NAME = cfg.cluster
+
+                    echo "[${params.BASE_NAME}] SERVER_NAME=${env.SERVER_NAME}, PORT=${env.PORT}, CLUSTER_NAME=${env.CLUSTER_NAME}, ARCHIVE_PATH=${env.ARCHIVE_PATH}"
+                    echo "[${params.BASE_NAME}] RELEASE_NUMBER=${env.RELEASE_NUMBER}, DIR_NAME=${env.DIR_NAME}"
+                }
+            }
+        }
+
+        stage('Lock Union & Kick users') {
+            when {
+                expression {
+                    return params.LOAD_CF == true || params.LOAD_EXT == true
+                }
+            }
+            steps {
+                script {
+                    def needBlock = (params.LOAD_CF == true || params.LOAD_EXT == true)
+
+                    if (needBlock) {
+                        try {
+                            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${params.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_LOCK}"
+                            writeFile file: "${env.LOCK_FILE}", text: 'locked'
+                            SHOULD_UPDATE = true
+                            echo "[${params.BASE_NAME}] База заблокирована, SHOULD_UPDATE=${SHOULD_UPDATE}"
+                        } catch (Exception e) {
+                            def errorMessage = "Ошибка блокировки базы ${params.BASE_NAME}: ${e.getMessage()}"
+                            echo "[${params.BASE_NAME}] ${errorMessage}"
+                            sendEmailNotification(
+                                "Ошибка: ${errorMessage}",
+                                "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                                true
+                            )
+                            error(errorMessage)
+                        }
+                    } else {
+                        echo "[${params.BASE_NAME}] Блокировка не требуется"
+                    }
+                }
+            }
+        }
+
+        stage('BackUp') {
+            when {
+                expression { params.NEED_BACKUP == true }
+            }
+            steps {
+                script {
+                    try {
+				        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_BACKUP} ${env.BASE_NAME}"
+                        echo "[${params.BASE_NAME}] Архивирование базы"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка сохранения архива для базы: ${params.BASE_NAME}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Load CF & Apply') {
+            when {
+                expression { params.LOAD_CF == true && fileExists(env.LOCK_FILE) }
+            }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_CF} ${env.SERVER_NAME} ${params.BASE_NAME} ${env.PORT} ${env.RELEASE_NUMBER} ${env.DIR_NAME} ${params.ENABLE_LOG}"
+                        echo "[${params.BASE_NAME}] Конфигурация загружена и применена"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка загрузки и (или) применения конфигурации ${params.BASE_NAME}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Load EXT & Apply') {
+            when {
+                expression { params.LOAD_EXT == true && fileExists(env.LOCK_FILE) }
+            }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOAD_EXT} ${env.SERVER_NAME} ${params.BASE_NAME} ${env.PORT} ${env.RELEASE_NUMBER} ${env.DIR_NAME} ${params.EXT_NAME} ${params.ENABLE_LOG}"
+                        echo "[${params.BASE_NAME}] Расширение загружено и применено"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка загрузки и (или) применения расширения ${params.BASE_NAME}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Start & Update') {
+            when {
+                expression { SHOULD_UPDATE == true && fileExists(env.LOCK_FILE) }
+            }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_START_AND_UPDATE} ${env.SERVER_NAME} ${params.BASE_NAME} ${env.PORT}"
+                        echo "[${params.BASE_NAME}] Монопольное обновление завершено"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка монопольного обновления ${params.BASE_NAME}: ${e.getMessage()}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Send message') {
+            when {
+                expression { params.SEND_MESSAGE == true }
+            }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n bash ${env.SCRIPT_GET_COMMITS} ${env.REPO_PATH} ${params.CHECK_TIME}"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка получения списка коммитов для сообщения, база ${params.BASE_NAME}: ${e.getMessage()}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                    }
+
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_SEND_MESSAGE} ${params.BASE_NAME}"
+                        echo "[${params.BASE_NAME}] Сообщение отправлено"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка отправки сообщения, база ${params.BASE_NAME}: ${e.getMessage()}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+
+        stage('Unlock') {
+            when {
+                expression { fileExists(env.LOCK_FILE) }
+            }
+            steps {
+                script {
+                    try {
+                        bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_LOCK} ${params.BASE_NAME} ${env.SERVER_NAME} ${env.CLUSTER_NAME} ${env.COMMAND_UNLOCK} ${env.UNBLOCK_REG}"
+                        bat "del \"${env.LOCK_FILE}\""
+                        echo "[${params.BASE_NAME}] База разблокирована"
+                    } catch (Exception e) {
+                        def errorMessage = "Ошибка разблокировки базы ${params.BASE_NAME}: ${e.getMessage()}"
+                        echo "[${params.BASE_NAME}] ${errorMessage}"
+                        sendEmailNotification(
+                            "Ошибка: ${errorMessage}",
+                            "<p>${errorMessage}</p><p>Подробности в логе Jenkins: ${BUILD_URL}/</p>",
+                            true
+                        )
+                        error(errorMessage)
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                echo "[${env.BASE_NAME}] Статус: ${currentBuild.currentResult}"
+            }
+        }
+        success {
+            script {
+                sendEmailNotification(
+                    'Успешно! Сборка базы',
+                    "<p>База <b>${params.BASE_NAME}</b> успешно собрана. Ошибок при сборке нет.</p>",
+                    false
+                )
+            }
+        }
+        failure {
+            script {
+                sendEmailNotification(
+                    'Ошибка! Сборка базы',
+                    "<p>Сборка базы <b>${params.BASE_NAME}</b> не произошла из-за ошибок, смотрите логи сборки.</p>",
+                    true
+                )
+            }
+        }
+        unstable {
+            script {
+                sendEmailNotification(
+                    'Нестабильно! Сборка базы',
+                    "<p>Сборка базы <b>${params.BASE_NAME}</b> нестабильна, некритично, смотрите лог.</p>",
+                    true
+                )
+            }
+        }
+        cleanup {
+            bat "chcp 65001\n ${env.OSCRIPT_PATH} ${env.SCRIPT_CLEAN} ${env.DIR_NAME} ${params.ENABLE_LOG}"
+        }
+    }
+}
