@@ -106,6 +106,23 @@ def runClientStep(String action, String title, String logFile) {
     }
 }
 
+def sendBuildNotification() {
+    def recipients = (params.EMAIL_TO ?: '').split(',').collect { it.trim() }.findAll { it }.unique().join(',')
+    def result = currentBuild.currentResult
+    if (!recipients || !(result in ['SUCCESS', 'FAILURE'])) {
+        return
+    }
+
+    def status = result == 'SUCCESS' ? 'Успешно' : 'Ошибка'
+    def subject = "${status}. ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+    def details = currentBuild.description ?: params.TARGET_INFOBASE?.trim()
+    def body = [subject, details, env.BUILD_URL].findAll { it }.join('\n')
+
+    catchError(buildResult: 'SUCCESS', catchInterruptions: false, message: 'Не удалось отправить уведомление по почте') {
+        emailext subject: subject, body: body, mimeType: 'text/plain', from: 'jenkins@mechel.com', to: recipients
+    }
+}
+
 def resolveToolkitFiles() {
     def repositoryDir = ['plugins', 'НоваяАвтоматизация/plugins'].find {
         fileExists(it + '/НастроитьInfostartToolkit.epf')
@@ -197,6 +214,8 @@ pipeline {
         )
         booleanParam(name: 'VERBOSE_LOG', defaultValue: false,
                      description: 'Включите для диагностики сборки и запуска 1С, чтобы видеть подробные сообщения Mechel уровня DEBUG. Для обычного прогона достаточно INFO.')
+        string(name: 'EMAIL_TO', defaultValue: '',
+               description: 'Электронный адрес для оповещений об успехе или ошибке. Укажите один или несколько адресов через запятую, например dev@example.org, qa@example.org. Пустое поле отключает рассылку.')
         credentials(
             name: 'TOKEN',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl',
@@ -505,13 +524,16 @@ pipeline {
         }
         cleanup {
             script {
-                try {
-                    removeBuildFiles()
-                } finally {
-                    if (env.MECHEL_SESSION_LOCK_ATTEMPTED == '1') {
-                        runLockScript('unlock', 'Снять блокировку базы-приёмника')
+                catchError(buildResult: 'FAILURE', catchInterruptions: false) {
+                    try {
+                        removeBuildFiles()
+                    } finally {
+                        if (env.MECHEL_SESSION_LOCK_ATTEMPTED == '1') {
+                            runLockScript('unlock', 'Снять блокировку базы-приёмника')
+                        }
                     }
                 }
+                sendBuildNotification()
             }
         }
     }
